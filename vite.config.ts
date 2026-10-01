@@ -16,7 +16,10 @@ const config = defineConfig({
     paraglideVitePlugin({
       project: './project.inlang',
       outdir: './src/paraglide',
-      strategy: ['url', 'baseLocale'],
+      // Locale follows the visitor (cookie, then browser), never the URL,
+      // so a shared group link opens in each person's own language.
+      strategy: ['cookie', 'preferredLanguage', 'baseLocale'],
+      cookieName: 'TOP_LIST_LOCALE',
     }),
     cloudflare({ viteEnvironment: { name: 'ssr' } }),
     tailwindcss(),

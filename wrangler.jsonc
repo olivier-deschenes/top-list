@@ -1,7 +1,23 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "tanstack-start-app",
-  "compatibility_date": "2025-09-02",
+  "name": "top-list",
+  "compatibility_date": "2026-09-25",
   "compatibility_flags": ["nodejs_compat"],
-  "main": "@tanstack/react-start/server-entry"
+  "main": "./src/server.ts",
+  "routes": [
+    {
+      "pattern": "list.odeschenes.dev",
+      "custom_domain": true,
+    },
+  ],
+  "observability": {
+    "enabled": true,
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "top-list",
+      "database_id": "ac6502c6-3187-4428-8ef2-5a65515a528c",
+    },
+  ],
 }

@@ -10,33 +10,120 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as GGroupIdRouteRouteImport } from './routes/g/$groupId/route'
+import { Route as GGroupIdIndexRouteImport } from './routes/g/$groupId/index'
+import { Route as GGroupIdActivityRouteImport } from './routes/g/$groupId/activity'
+import { Route as GGroupIdSettingsRouteImport } from './routes/g/$groupId/settings'
+import { Route as GGroupIdEntriesEntryIdRouteImport } from './routes/g/$groupId/entries/$entryId'
+import { Route as GGroupIdMembersIndexRouteImport } from './routes/g/$groupId/members/index'
+import { Route as GGroupIdMembersUsernameRouteImport } from './routes/g/$groupId/members/$username'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GGroupIdRouteRoute = GGroupIdRouteRouteImport.update({
+  id: '/g/$groupId',
+  path: '/g/$groupId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GGroupIdIndexRoute = GGroupIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => GGroupIdRouteRoute,
+} as any)
+const GGroupIdActivityRoute = GGroupIdActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => GGroupIdRouteRoute,
+} as any)
+const GGroupIdSettingsRoute = GGroupIdSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => GGroupIdRouteRoute,
+} as any)
+const GGroupIdEntriesEntryIdRoute = GGroupIdEntriesEntryIdRouteImport.update({
+  id: '/entries/$entryId',
+  path: '/entries/$entryId',
+  getParentRoute: () => GGroupIdRouteRoute,
+} as any)
+const GGroupIdMembersIndexRoute = GGroupIdMembersIndexRouteImport.update({
+  id: '/members/',
+  path: '/members/',
+  getParentRoute: () => GGroupIdRouteRoute,
+} as any)
+const GGroupIdMembersUsernameRoute = GGroupIdMembersUsernameRouteImport.update({
+  id: '/members/$username',
+  path: '/members/$username',
+  getParentRoute: () => GGroupIdRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/g/$groupId': typeof GGroupIdRouteRouteWithChildren
+  '/g/$groupId/activity': typeof GGroupIdActivityRoute
+  '/g/$groupId/settings': typeof GGroupIdSettingsRoute
+  '/g/$groupId/': typeof GGroupIdIndexRoute
+  '/g/$groupId/entries/$entryId': typeof GGroupIdEntriesEntryIdRoute
+  '/g/$groupId/members/$username': typeof GGroupIdMembersUsernameRoute
+  '/g/$groupId/members/': typeof GGroupIdMembersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/g/$groupId/activity': typeof GGroupIdActivityRoute
+  '/g/$groupId/settings': typeof GGroupIdSettingsRoute
+  '/g/$groupId': typeof GGroupIdIndexRoute
+  '/g/$groupId/entries/$entryId': typeof GGroupIdEntriesEntryIdRoute
+  '/g/$groupId/members/$username': typeof GGroupIdMembersUsernameRoute
+  '/g/$groupId/members': typeof GGroupIdMembersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/g/$groupId': typeof GGroupIdRouteRouteWithChildren
+  '/g/$groupId/activity': typeof GGroupIdActivityRoute
+  '/g/$groupId/settings': typeof GGroupIdSettingsRoute
+  '/g/$groupId/': typeof GGroupIdIndexRoute
+  '/g/$groupId/entries/$entryId': typeof GGroupIdEntriesEntryIdRoute
+  '/g/$groupId/members/$username': typeof GGroupIdMembersUsernameRoute
+  '/g/$groupId/members/': typeof GGroupIdMembersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/g/$groupId'
+    | '/g/$groupId/activity'
+    | '/g/$groupId/settings'
+    | '/g/$groupId/'
+    | '/g/$groupId/entries/$entryId'
+    | '/g/$groupId/members/$username'
+    | '/g/$groupId/members/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/g/$groupId/activity'
+    | '/g/$groupId/settings'
+    | '/g/$groupId'
+    | '/g/$groupId/entries/$entryId'
+    | '/g/$groupId/members/$username'
+    | '/g/$groupId/members'
+  id:
+    | '__root__'
+    | '/'
+    | '/g/$groupId'
+    | '/g/$groupId/activity'
+    | '/g/$groupId/settings'
+    | '/g/$groupId/'
+    | '/g/$groupId/entries/$entryId'
+    | '/g/$groupId/members/$username'
+    | '/g/$groupId/members/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  GGroupIdRouteRoute: typeof GGroupIdRouteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -48,12 +135,93 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/g/$groupId': {
+      id: '/g/$groupId'
+      path: '/g/$groupId'
+      fullPath: '/g/$groupId'
+      preLoaderRoute: typeof GGroupIdRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/g/$groupId/': {
+      id: '/g/$groupId/'
+      path: '/'
+      fullPath: '/g/$groupId/'
+      preLoaderRoute: typeof GGroupIdIndexRouteImport
+      parentRoute: typeof GGroupIdRouteRoute
+    }
+    '/g/$groupId/activity': {
+      id: '/g/$groupId/activity'
+      path: '/activity'
+      fullPath: '/g/$groupId/activity'
+      preLoaderRoute: typeof GGroupIdActivityRouteImport
+      parentRoute: typeof GGroupIdRouteRoute
+    }
+    '/g/$groupId/settings': {
+      id: '/g/$groupId/settings'
+      path: '/settings'
+      fullPath: '/g/$groupId/settings'
+      preLoaderRoute: typeof GGroupIdSettingsRouteImport
+      parentRoute: typeof GGroupIdRouteRoute
+    }
+    '/g/$groupId/entries/$entryId': {
+      id: '/g/$groupId/entries/$entryId'
+      path: '/entries/$entryId'
+      fullPath: '/g/$groupId/entries/$entryId'
+      preLoaderRoute: typeof GGroupIdEntriesEntryIdRouteImport
+      parentRoute: typeof GGroupIdRouteRoute
+    }
+    '/g/$groupId/members/': {
+      id: '/g/$groupId/members/'
+      path: '/members'
+      fullPath: '/g/$groupId/members/'
+      preLoaderRoute: typeof GGroupIdMembersIndexRouteImport
+      parentRoute: typeof GGroupIdRouteRoute
+    }
+    '/g/$groupId/members/$username': {
+      id: '/g/$groupId/members/$username'
+      path: '/members/$username'
+      fullPath: '/g/$groupId/members/$username'
+      preLoaderRoute: typeof GGroupIdMembersUsernameRouteImport
+      parentRoute: typeof GGroupIdRouteRoute
+    }
   }
 }
 
+interface GGroupIdRouteRouteChildren {
+  GGroupIdActivityRoute: typeof GGroupIdActivityRoute
+  GGroupIdSettingsRoute: typeof GGroupIdSettingsRoute
+  GGroupIdIndexRoute: typeof GGroupIdIndexRoute
+  GGroupIdEntriesEntryIdRoute: typeof GGroupIdEntriesEntryIdRoute
+  GGroupIdMembersUsernameRoute: typeof GGroupIdMembersUsernameRoute
+  GGroupIdMembersIndexRoute: typeof GGroupIdMembersIndexRoute
+}
+
+const GGroupIdRouteRouteChildren: GGroupIdRouteRouteChildren = {
+  GGroupIdActivityRoute: GGroupIdActivityRoute,
+  GGroupIdSettingsRoute: GGroupIdSettingsRoute,
+  GGroupIdIndexRoute: GGroupIdIndexRoute,
+  GGroupIdEntriesEntryIdRoute: GGroupIdEntriesEntryIdRoute,
+  GGroupIdMembersUsernameRoute: GGroupIdMembersUsernameRoute,
+  GGroupIdMembersIndexRoute: GGroupIdMembersIndexRoute,
+}
+
+const GGroupIdRouteRouteWithChildren = GGroupIdRouteRoute._addFileChildren(
+  GGroupIdRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  GGroupIdRouteRoute: GGroupIdRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

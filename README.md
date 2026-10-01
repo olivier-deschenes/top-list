@@ -1,225 +1,59 @@
-Welcome to your new TanStack Start app!
+# Top List
 
-# Getting Started
+Private group rankings. Make a group, share its link, and let everyone add places (or anything else) and rate them with 1 to 5 stars and a comment. The best one rises to the top.
 
-To run this application:
+- **No accounts.** A group is a random UUID; anyone with the link can view and change it.
+- **Pick a name, no password.** Each device remembers who it is in each group (localStorage). Anyone can act as anyone, by design.
+- **Tracked per person.** Every entry, review, rename, and delete is attributed and shown in the group's activity feed.
+- **English and French**, following the browser language (with a picker in the footer).
+
+## Stack
+
+TanStack Start (React 19, SSR) on Cloudflare Workers, Cloudflare D1 for storage, TanStack Router/Query/Form/Table/DB, shadcn/ui + Tailwind CSS, Paraglide for i18n.
+
+| Path                  | What                                                                        |
+| --------------------- | --------------------------------------------------------------------------- |
+| `migrations/`         | D1 schema (plain SQL, applied with `wrangler d1 migrations`)                |
+| `src/server/`         | Server functions (`*.functions.ts`) and D1 access (`db.server.ts`)          |
+| `src/lib/schemas.ts`  | Zod validation shared by forms and server functions                         |
+| `src/lib/ranking.ts`  | Ranking and per-member stats (unit tested)                                  |
+| `src/lib/queries.ts`  | TanStack Query options and mutation hooks                                   |
+| `src/db-collections/` | Device-local "your groups" and identity (TanStack DB, localStorage)         |
+| `src/routes/`         | Pages: home, `/g/$groupId` (rankings, entries, members, activity, settings) |
+| `messages/`           | `en.json` and `fr.json` UI strings                                          |
+
+### Ranking
+
+Entries are ordered by a weighted rating, `(2 × 3 + sum of ratings) / (2 + number of reviews)`: every entry starts as if it had two 3-star reviews, so one 5-star review can't beat ten 4.8s. The prior is fixed, so an entry's score only changes when its own reviews change. Ties go to the entry with more reviews, then by name.
+
+## Develop
 
 ```bash
 bun install
-bun --bun run dev
+bun run cf-typegen
+bun run db:migrate:local
+bun run dev
 ```
 
-# Building For Production
-
-To build this application for production:
+The app runs at http://localhost:3000 with a local D1 database in `.wrangler/state`.
 
 ```bash
-bun --bun run build
+bun run test        # unit tests (Vitest)
+bun run typecheck   # tsc
+bun run lint        # eslint
+bun run build       # production build
 ```
 
-## Styling
+After changing `wrangler.jsonc`, rerun `bun run cf-typegen`. To change the schema, add a new numbered file in `migrations/` and apply it with `bun run db:migrate:local`.
 
-This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
+## Deploy to Cloudflare
 
-### Removing Tailwind CSS
-
-If you prefer not to use Tailwind CSS:
-
-1. Remove the demo pages in `src/routes/demo/`
-2. Replace the Tailwind import in `src/styles.css` with your own styles
-3. Remove `tailwindcss()` from the plugins array in `vite.config.ts`
-4. Remove `@tailwindcss/vite` and `tailwindcss` from `package.json`
-
-## Linting & Formatting
-
-
-This project uses [eslint](https://eslint.org/) and [prettier](https://prettier.io/) for linting and formatting. Eslint is configured using [tanstack/eslint-config](https://tanstack.com/config/latest/docs/eslint). The following scripts are available:
+Live at https://list.odeschenes.dev.
 
 ```bash
-bun --bun run lint
-bun --bun run format
-bun --bun run check
+bun run deploy
 ```
 
+This builds, applies pending migrations to the remote D1 database, and deploys the Worker. Run `bunx wrangler login` first if needed.
 
-## Deploy to Cloudflare Workers
-
-This project uses the Cloudflare Vite plugin (configured in `vite.config.ts`) and `wrangler.jsonc`:
-
-1. Install Wrangler: `npm install -g wrangler`
-2. Authenticate: `wrangler login`
-3. Deploy: `npx wrangler deploy`
-
-For production env vars, run `wrangler secret put MY_VAR` for each secret listed in `.env.example`. Public (non-secret) vars go in `wrangler.jsonc` under `vars`.
-
-KV, D1, R2, and Durable Object bindings are configured in `wrangler.jsonc` — see https://developers.cloudflare.com/workers/wrangler/configuration/.
-
-
-# Paraglide i18n
-
-This add-on wires up ParaglideJS for localized routing and message formatting.
-
-- Messages live in `project.inlang/messages`.
-- URLs are localized through the Paraglide Vite plugin and router `rewrite` hooks.
-- Run the dev server or build to regenerate the `src/paraglide` outputs.
-
-
-## Shadcn
-
-Add components using the latest version of [Shadcn](https://ui.shadcn.com/).
-
-```bash
-pnpm dlx shadcn@latest add button
-```
-
-
-
-## Routing
-
-This project uses [TanStack Router](https://tanstack.com/router) with file-based routing. Routes are managed as files in `src/routes`.
-
-### Adding A Route
-
-To add a new route to your application just add a new file in the `./src/routes` directory.
-
-TanStack will automatically generate the content of the route file for you.
-
-Now that you have two routes you can use a `Link` component to navigate between them.
-
-### Adding Links
-
-To use SPA (Single Page Application) navigation you will need to import the `Link` component from `@tanstack/react-router`.
-
-```tsx
-import { Link } from "@tanstack/react-router";
-```
-
-Then anywhere in your JSX you can use it like so:
-
-```tsx
-<Link to="/about">About</Link>
-```
-
-This will create a link that will navigate to the `/about` route.
-
-More information on the `Link` component can be found in the [Link documentation](https://tanstack.com/router/v1/docs/framework/react/api/router/linkComponent).
-
-### Using A Layout
-
-In the File Based Routing setup the layout is located in `src/routes/__root.tsx`. Anything you add to the root route will appear in all the routes. The route content will appear in the JSX where you render `{children}` in the `shellComponent`.
-
-Here is an example layout that includes a header:
-
-```tsx
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
-
-export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      { charSet: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: 'My App' },
-    ],
-  }),
-  shellComponent: ({ children }) => (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        <header>
-          <nav>
-            <Link to="/">Home</Link>
-            <Link to="/about">About</Link>
-          </nav>
-        </header>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  ),
-})
-```
-
-More information on layouts can be found in the [Layouts documentation](https://tanstack.com/router/latest/docs/framework/react/guide/routing-concepts#layouts).
-
-## Server Functions
-
-TanStack Start provides server functions that allow you to write server-side code that seamlessly integrates with your client components.
-
-```tsx
-import { createServerFn } from '@tanstack/react-start'
-
-const getServerTime = createServerFn({
-  method: 'GET',
-}).handler(async () => {
-  return new Date().toISOString()
-})
-
-// Use in a component
-function MyComponent() {
-  const [time, setTime] = useState('')
-  
-  useEffect(() => {
-    getServerTime().then(setTime)
-  }, [])
-  
-  return <div>Server time: {time}</div>
-}
-```
-
-## API Routes
-
-You can create API routes by using the `server` property in your route definitions:
-
-```tsx
-import { createFileRoute } from '@tanstack/react-router'
-import { json } from '@tanstack/react-start'
-
-export const Route = createFileRoute('/api/hello')({
-  server: {
-    handlers: {
-      GET: () => json({ message: 'Hello, World!' }),
-    },
-  },
-})
-```
-
-## Data Fetching
-
-There are multiple ways to fetch data in your application. You can use TanStack Query to fetch data from a server. But you can also use the `loader` functionality built into TanStack Router to load the data for a route before it's rendered.
-
-For example:
-
-```tsx
-import { createFileRoute } from '@tanstack/react-router'
-
-export const Route = createFileRoute('/people')({
-  loader: async () => {
-    const response = await fetch('https://swapi.dev/api/people')
-    return response.json()
-  },
-  component: PeopleComponent,
-})
-
-function PeopleComponent() {
-  const data = Route.useLoaderData()
-  return (
-    <ul>
-      {data.results.map((person) => (
-        <li key={person.name}>{person.name}</li>
-      ))}
-    </ul>
-  )
-}
-```
-
-Loaders simplify your data fetching logic dramatically. Check out more information in the [Loader documentation](https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#loader-parameters).
-
-
-
-# Learn More
-
-You can learn more about all of the offerings from TanStack in the [TanStack documentation](https://tanstack.com).
-
-For TanStack Start specific documentation, visit [TanStack Start](https://tanstack.com/start).
+To deploy to a different Cloudflare account, create a database with `bunx wrangler d1 create top-list` and put its id in `wrangler.jsonc` as the `DB` binding's `database_id`. Keep a single `DB` entry without `"remote": true`, so local dev keeps using the local database.
