@@ -8,6 +8,7 @@ import { EntryFormDialog } from '#/components/entries/entry-form-dialog'
 import { Leaderboard } from '#/components/entries/leaderboard'
 import { SORT_COLUMNS } from '#/components/entries/leaderboard-sort'
 import type { LeaderboardSort } from '#/components/entries/leaderboard-sort'
+import { TopThree } from '#/components/entries/top-three'
 import { useGroup } from '#/components/group/group-context'
 import { PageHeader } from '#/components/page'
 import { Button } from '#/components/ui/button'
@@ -24,8 +25,9 @@ import {
   InputGroupInput,
 } from '#/components/ui/input-group'
 import { ToggleGroup, ToggleGroupItem } from '#/components/ui/toggle-group'
-import { groupQuery, useCreateEntry } from '#/lib/queries'
+import { groupQuery, useCreateEntry, useSaveReview } from '#/lib/queries'
 import { collectTags, isSameUser, rankEntries } from '#/lib/ranking'
+import type { Review } from '#/lib/types'
 import { m } from '#/paraglide/messages'
 
 export const Route = createFileRoute('/g/$groupId/')({
@@ -48,19 +50,27 @@ function Rankings() {
   const { data } = useSuspenseQuery(groupQuery(groupId))
   const { username, requireIdentity } = useGroup()
   const createEntry = useCreateEntry(groupId)
+  const saveReview = useSaveReview(groupId)
   const [addOpen, setAddOpen] = useState(false)
   const searchId = useId()
 
   const rankings = rankEntries(data.entries, data.reviews)
   const allTags = collectTags(data.entries)
   const activeTags = (search.tags ?? []).filter((tag) => allTags.includes(tag))
-  const myRatings = new Map(
+  const myReviews = new Map<string, Review>(
     username
       ? data.reviews
           .filter((review) => isSameUser(review.username, username))
-          .map((review) => [review.entryId, review.rating])
+          .map((review) => [review.entryId, review])
       : [],
   )
+  const myRatings = new Map(
+    [...myReviews].map(([entryId, review]) => [entryId, review.rating]),
+  )
+  // The podium: up to three rated entries, best first.
+  const topThree = rankings.entries
+    .filter((item) => item.rank !== null)
+    .slice(0, 3)
   const sort: LeaderboardSort = search.sort
     ? { column: search.sort, desc: search.dir === 'desc' }
     : DEFAULT_SORT
@@ -74,6 +84,20 @@ function Rankings() {
 
   const openAddEntry = () => {
     if (requireIdentity()) setAddOpen(true)
+  }
+
+  /** Saves a star rating from the list, keeping any comment already written. */
+  const vote = (entryId: string, rating: number) => {
+    const actor = requireIdentity()
+    if (!actor) return
+    const existing = myReviews.get(entryId)
+    if (existing?.rating === rating) return
+    saveReview.mutate({
+      entryId,
+      username: actor,
+      rating,
+      comment: existing?.comment ?? '',
+    })
   }
 
   return (
@@ -107,6 +131,15 @@ function Rankings() {
         </Empty>
       ) : (
         <>
+          {topThree.length > 0 ? (
+            <TopThree
+              groupId={groupId}
+              items={topThree}
+              myRatings={myRatings}
+              onVote={vote}
+            />
+          ) : null}
+
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
             <div className="sm:w-72">
               <label htmlFor={searchId} className="sr-only">
@@ -158,6 +191,7 @@ function Rankings() {
             groupId={groupId}
             data={rankings.entries}
             myRatings={myRatings}
+            onVote={vote}
             query={search.q ?? ''}
             tags={activeTags}
             sort={sort}
