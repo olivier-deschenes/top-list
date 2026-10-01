@@ -68,8 +68,8 @@ export function Section({
 }) {
   return (
     <section aria-labelledby={id} className={cn('space-y-4', className)}>
-      <div className="flex items-end justify-between gap-4">
-        <div className="space-y-1">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
+        <div className="min-w-0 space-y-1">
           <h2 id={id} className="text-base font-semibold tracking-tight">
             {title}
           </h2>
@@ -79,7 +79,7 @@ export function Section({
             </p>
           ) : null}
         </div>
-        {actions}
+        {actions ? <div className="flex shrink-0 gap-2">{actions}</div> : null}
       </div>
       {children}
     </section>

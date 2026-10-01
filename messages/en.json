@@ -103,6 +103,9 @@
   "entry_edit_title": "Edit entry",
   "field_entry_name": "Name",
   "field_entry_name_placeholder": "Pho Lien",
+  "field_address": "Address",
+  "field_address_placeholder": "Street address or neighborhood",
+  "field_address_hint": "Shows the place on a map.",
   "field_notes": "Notes",
   "field_notes_placeholder": "Get the number 14. Cash only.",
   "field_link": "Link",
@@ -124,6 +127,9 @@
   "entry_rank": "Rank {rank} of {total}",
   "entry_open_link": "Open link",
   "entry_tags_label": "Tags",
+  "entry_location_title": "Location",
+  "entry_open_in_maps": "Open in Google Maps",
+  "entry_map_title": "Map of {name}",
 
   "review_count": [
     {

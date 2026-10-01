@@ -18,6 +18,7 @@ export interface Member {
 export interface Entry {
   id: string
   name: string
+  address: string | null
   notes: string | null
   url: string | null
   tags: Array<string>

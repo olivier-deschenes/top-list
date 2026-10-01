@@ -15,6 +15,7 @@ import {
 } from '@tabler/icons-react'
 import { toast } from 'sonner'
 import { EntryFormDialog } from '#/components/entries/entry-form-dialog'
+import { EntryLocation } from '#/components/entries/entry-location'
 import { RatingDistribution } from '#/components/entries/rating-distribution'
 import { ReviewForm } from '#/components/entries/review-form'
 import { useGroup } from '#/components/group/group-context'
@@ -207,6 +208,10 @@ function EntryPage() {
           total={ranked.reviewCount}
         />
       </div>
+
+      {entry.address ? (
+        <EntryLocation name={entry.name} address={entry.address} />
+      ) : null}
 
       <Section id="your-review" title={m.your_review_title()}>
         <ClientOnly fallback={<Skeleton className="h-40 max-w-xl" />}>

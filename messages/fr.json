@@ -103,6 +103,9 @@
   "entry_edit_title": "Modifier l’entrée",
   "field_entry_name": "Nom",
   "field_entry_name_placeholder": "Pho Lien",
+  "field_address": "Adresse",
+  "field_address_placeholder": "Adresse ou quartier",
+  "field_address_hint": "Affiche l’endroit sur une carte.",
   "field_notes": "Notes",
   "field_notes_placeholder": "Prenez le numéro 14. Comptant seulement.",
   "field_link": "Lien",
@@ -124,6 +127,9 @@
   "entry_rank": "Rang {rank} sur {total}",
   "entry_open_link": "Ouvrir le lien",
   "entry_tags_label": "Étiquettes",
+  "entry_location_title": "Emplacement",
+  "entry_open_in_maps": "Ouvrir dans Google Maps",
+  "entry_map_title": "Carte de {name}",
 
   "review_count": [
     {

@@ -49,7 +49,7 @@ interface ColumnMeta {
   wide?: boolean
 }
 
-/** Fuzzy match on name, notes, and tags; keeps the ranking for later use. */
+/** Fuzzy match on an entry's text and tags; keeps the ranking for later use. */
 function fuzzyFilter(
   row: Row<any, any>,
   _columnId: string,
@@ -60,6 +60,7 @@ function fuzzyFilter(
   const itemRank = rankItem(entry, query, {
     accessors: [
       (item) => item.name,
+      (item) => item.address ?? '',
       (item) => item.notes ?? '',
       (item) => item.tags.join(' '),
     ],
