@@ -3,11 +3,9 @@
 import { Toaster as Sonner, type ToasterProps } from "sonner"
 import { IconCircleCheck, IconInfoCircle, IconAlertTriangle, IconAlertOctagon, IconLoader } from "@tabler/icons-react"
 
-// The app follows the system color scheme, so no theme provider is needed.
 const Toaster = ({ ...props }: ToasterProps) => {
   return (
     <Sonner
-      theme="system"
       className="toaster group"
       icons={{
         success: (

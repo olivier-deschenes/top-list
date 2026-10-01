@@ -19,6 +19,7 @@ import { Toaster } from '#/components/ui/sonner'
 import { TooltipProvider } from '#/components/ui/tooltip'
 import { m } from '#/paraglide/messages'
 import { getLocale } from '#/paraglide/runtime'
+import { getTheme } from '#/server/theme.functions'
 
 import appCss from '../styles.css?url'
 
@@ -32,6 +33,8 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       document.documentElement.setAttribute('lang', getLocale())
     }
   },
+
+  loader: () => getTheme(),
 
   head: () => ({
     meta: [
@@ -92,8 +95,9 @@ function RootError({ reset }: ErrorComponentProps) {
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const theme = Route.useLoaderData()
   return (
-    <html lang={getLocale()}>
+    <html lang={getLocale()} data-theme={theme}>
       <head>
         <HeadContent />
       </head>
@@ -112,7 +116,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             </main>
             <AppFooter />
           </div>
-          <Toaster position="bottom-center" />
+          <Toaster position="bottom-center" theme={theme} />
         </TooltipProvider>
         <TanStackDevtools
           config={{

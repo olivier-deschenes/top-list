@@ -4,8 +4,17 @@
 @import '@fontsource-variable/geist';
 @import '@fontsource-variable/geist-mono';
 
-/* Dark mode follows the operating system; there is no theme switcher. */
-@custom-variant dark (@media (prefers-color-scheme: dark));
+/* `data-theme` on <html> forces light or dark; otherwise the OS decides. */
+@custom-variant dark {
+  &:where([data-theme='dark'], [data-theme='dark'] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:not(:where([data-theme='light'], [data-theme='light'] *)) {
+      @slot;
+    }
+  }
+}
 
 :root {
   color-scheme: light dark;
@@ -42,10 +51,13 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
+  &[data-theme='light'] {
+    color-scheme: light;
+  }
+
+  @variant dark {
+    color-scheme: dark;
     --background: oklch(0.145 0 0);
     --foreground: oklch(0.985 0 0);
     --card: oklch(0.205 0 0);
