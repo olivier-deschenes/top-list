@@ -39,20 +39,7 @@ import { compareRanked } from '#/lib/ranking'
 import type { RankedEntry } from '#/lib/ranking'
 import { cn } from '#/lib/utils'
 import { m } from '#/paraglide/messages'
-
-export const SORT_COLUMNS = [
-  'rank',
-  'name',
-  'rating',
-  'reviews',
-  'addedBy',
-] as const
-export type SortColumn = (typeof SORT_COLUMNS)[number]
-
-export interface LeaderboardSort {
-  column: SortColumn
-  desc: boolean
-}
+import type { LeaderboardSort, SortColumn } from './leaderboard-sort'
 
 interface ColumnMeta {
   label: () => string
@@ -186,7 +173,7 @@ export function Leaderboard({
 
   return (
     <Table className="text-sm">
-      <TableCaption className="mt-4 text-left text-xs text-muted-foreground">
+      <TableCaption className="sr-only">
         {m.rankings_caption()}
       </TableCaption>
       <TableHeader>

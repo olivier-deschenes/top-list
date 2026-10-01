@@ -44,7 +44,7 @@ function Members() {
     <div className="space-y-6">
       <PageHeader title={m.members_title()} />
       <Table className="text-sm">
-        <TableCaption className="mt-4 text-left text-xs text-muted-foreground">
+        <TableCaption className="sr-only">
           {m.members_caption()}
         </TableCaption>
         <TableHeader>

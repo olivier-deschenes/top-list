@@ -76,10 +76,7 @@ function Activity() {
 
   return (
     <div className="space-y-8">
-      <PageHeader
-        title={m.activity_title()}
-        description={m.activity_caption()}
-      />
+      <PageHeader title={m.activity_title()} />
       {items.length === 0 ? (
         <p className="text-sm text-muted-foreground">{m.activity_empty()}</p>
       ) : (

@@ -208,11 +208,7 @@ function EntryPage() {
         />
       </div>
 
-      <Section
-        id="your-review"
-        title={m.your_review_title()}
-        description={m.your_review_hint()}
-      >
+      <Section id="your-review" title={m.your_review_title()}>
         <ClientOnly fallback={<Skeleton className="h-40 max-w-xl" />}>
           {username ? (
             <ReviewForm
