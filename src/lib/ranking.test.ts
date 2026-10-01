@@ -5,6 +5,7 @@ import type { Entry, Member, Review } from './types'
 const entry = (id: string, name = id, createdBy = 'alex'): Entry => ({
   id,
   name,
+  address: null,
   notes: null,
   url: null,
   tags: [],

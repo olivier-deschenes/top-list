@@ -4,6 +4,7 @@ Private group rankings. Make a group, share its link, and let everyone add place
 
 - **No accounts.** A group is a random UUID; anyone with the link can view and change it.
 - **Pick a name, no password.** Each device remembers who it is in each group (localStorage). Anyone can act as anyone, by design.
+- **On the map.** Give an entry an address and its page shows it on a Google map, with Google's card for the place and a link to it in Google Maps. No API key needed.
 - **Tracked per person.** Every entry, review, rename, and delete is attributed and shown in the group's activity feed.
 - **English and French**, following the browser language (with a picker in the footer).
 

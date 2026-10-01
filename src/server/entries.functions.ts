@@ -24,13 +24,14 @@ export const createEntry = createServerFn({ method: 'POST' })
       touchMember(data.groupId, username, at),
       db()
         .prepare(
-          `INSERT INTO entries (id, group_id, name, notes, url, tags, created_by, created_at, updated_at)
-           VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?8)`,
+          `INSERT INTO entries (id, group_id, name, address, notes, url, tags, created_by, created_at, updated_at)
+           VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?9)`,
         )
         .bind(
           id,
           data.groupId,
           data.name,
+          data.address,
           data.notes,
           data.url,
           JSON.stringify(data.tags),
@@ -59,11 +60,12 @@ export const updateEntry = createServerFn({ method: 'POST' })
       touchMember(data.groupId, username, at),
       db()
         .prepare(
-          `UPDATE entries SET name = ?, notes = ?, url = ?, tags = ?, updated_by = ?, updated_at = ?
+          `UPDATE entries SET name = ?, address = ?, notes = ?, url = ?, tags = ?, updated_by = ?, updated_at = ?
            WHERE id = ? AND group_id = ?`,
         )
         .bind(
           data.name,
+          data.address,
           data.notes,
           data.url,
           JSON.stringify(data.tags),

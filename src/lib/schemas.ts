@@ -9,6 +9,7 @@ export const LIMITS = {
   groupName: 60,
   description: 280,
   entryName: 80,
+  address: 200,
   notes: 500,
   url: 500,
   tag: 24,
@@ -73,6 +74,7 @@ export const usernameSchema = requiredText(LIMITS.username).transform(
 export const groupNameSchema = requiredText(LIMITS.groupName)
 export const descriptionSchema = optionalText(LIMITS.description)
 export const entryNameSchema = requiredText(LIMITS.entryName)
+export const addressSchema = optionalText(LIMITS.address)
 export const notesSchema = optionalText(LIMITS.notes)
 export const commentSchema = optionalText(LIMITS.comment)
 
@@ -124,6 +126,7 @@ export const renameMemberInput = z.object({
 
 export const entryFieldsSchema = z.object({
   name: entryNameSchema,
+  address: addressSchema,
   notes: notesSchema,
   url: urlSchema,
   tags: tagsSchema,

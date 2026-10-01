@@ -30,6 +30,7 @@ export interface MemberRow {
 export interface EntryRow {
   id: string
   name: string
+  address: string | null
   notes: string | null
   url: string | null
   tags: string
@@ -62,7 +63,7 @@ const GROUP_COLUMNS =
   'id, name, description, created_by, created_at, updated_at'
 const MEMBER_COLUMNS = 'username, joined_at, last_active_at'
 const ENTRY_COLUMNS =
-  'id, name, notes, url, tags, created_by, updated_by, created_at, updated_at'
+  'id, name, address, notes, url, tags, created_by, updated_by, created_at, updated_at'
 const REVIEW_COLUMNS =
   'entry_id, username, rating, comment, created_at, updated_at'
 export const ACTIVITY_COLUMNS =
@@ -99,6 +100,7 @@ const parseTags = (raw: string): Array<string> => {
 const toEntry = (row: EntryRow): Entry => ({
   id: row.id,
   name: row.name,
+  address: row.address,
   notes: row.notes,
   url: row.url,
   tags: parseTags(row.tags),
