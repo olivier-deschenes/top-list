@@ -268,11 +268,12 @@ function LeaderboardRow({
 }) {
   const { entry } = item
   return (
-    <TableRow className="align-top">
-      <TableCell className="py-3 pl-0 text-right leading-none">
+    // Cells share the first text baseline, however many lines each wraps to.
+    <TableRow>
+      <TableCell className="py-3 pl-0 text-right align-baseline">
         <RankBadge rank={item.rank} />
       </TableCell>
-      <TableCell className="py-3 whitespace-normal">
+      <TableCell className="py-3 align-baseline whitespace-normal">
         <Link
           to="/g/$groupId/entries/$entryId"
           params={{ groupId, entryId: entry.id }}
@@ -281,7 +282,7 @@ function LeaderboardRow({
           {entry.name}
         </Link>
         {/* Phones hide the rating and review columns; sum them up here. */}
-        <p className="mt-0.5 text-xs text-muted-foreground sm:hidden">
+        <p className="mt-0.5 text-muted-foreground sm:hidden">
           {item.average === null ? (
             m.not_rated()
           ) : (
@@ -291,9 +292,9 @@ function LeaderboardRow({
               </span>
               <span
                 aria-hidden="true"
-                className="inline-flex items-center gap-0.5 font-medium text-foreground"
+                className="inline-flex items-baseline gap-1 font-medium text-foreground tabular-nums"
               >
-                <IconStarFilled className="size-3" />
+                <IconStarFilled className="size-3.5" />
                 {formatRating(item.average)}
               </span>
               {' · '}
@@ -303,11 +304,11 @@ function LeaderboardRow({
         </p>
         <EntryMeta entry={entry} className="mt-0.5" />
       </TableCell>
-      <TableCell className="hidden py-3 text-right sm:table-cell">
+      <TableCell className="hidden py-3 text-right align-baseline sm:table-cell">
         {item.average === null ? (
-          <span className="text-xs text-muted-foreground">{m.not_rated()}</span>
+          <span className="text-muted-foreground">{m.not_rated()}</span>
         ) : (
-          <span className="inline-flex items-center gap-2">
+          <span className="inline-flex items-baseline gap-2">
             <StarRating value={item.average} />
             <span className="font-medium tabular-nums">
               {formatRating(item.average)}
@@ -315,10 +316,10 @@ function LeaderboardRow({
           </span>
         )}
       </TableCell>
-      <TableCell className="hidden py-3 text-right tabular-nums sm:table-cell">
+      <TableCell className="hidden py-3 text-right align-baseline tabular-nums sm:table-cell">
         {item.reviewCount}
       </TableCell>
-      <TableCell className="py-2 pr-0 sm:pr-2">
+      <TableCell className="py-2 pr-0 align-baseline sm:pr-2">
         <StarVote
           value={myRating}
           onChange={(rating) => onVote(entry.id, rating)}
@@ -326,7 +327,7 @@ function LeaderboardRow({
           className="ml-auto"
         />
       </TableCell>
-      <TableCell className="hidden py-3 pr-0 sm:table-cell">
+      <TableCell className="hidden py-3 pr-0 align-baseline sm:table-cell">
         <Link
           to="/g/$groupId/members/$username"
           params={{ groupId, username: entry.createdBy }}

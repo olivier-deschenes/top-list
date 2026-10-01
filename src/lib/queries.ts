@@ -150,12 +150,22 @@ export function useDeleteEntry(groupId: string) {
 
 type ReviewTarget = { username: string; entryId: string }
 
-/** Applies a review change to the cached snapshot so the ranking moves instantly. */
+/**
+ * Applies a review change to the cached snapshot so the ranking moves instantly.
+ *
+ * Quick re-votes from the rankings overlap. Review writes therefore share a
+ * mutation scope, so they reach the server in click order, and only the last
+ * one to settle refetches: refetching earlier would flash a stale rating.
+ */
 function useOptimisticReviews(groupId: string) {
   const queryClient = useQueryClient()
   const key = groupKey(groupId)
+  const mutationKey = [...key, 'reviews']
+  // The count includes the mutation whose callback is asking.
+  const othersPending = () => queryClient.isMutating({ mutationKey }) > 1
 
   return {
+    options: { mutationKey, scope: { id: mutationKey.join(':') } },
     async apply(update: (reviews: Array<Review>) => Array<Review>) {
       await queryClient.cancelQueries({ queryKey: key })
       const previous = queryClient.getQueryData<GroupSnapshot>(key)
@@ -168,9 +178,15 @@ function useOptimisticReviews(groupId: string) {
       return { previous }
     },
     rollback(context: { previous?: GroupSnapshot } | undefined) {
+      // A later write still holds its own optimistic state; the last settle
+      // refetches the truth.
+      if (othersPending()) return
       if (context?.previous) queryClient.setQueryData(key, context.previous)
     },
-    settle: () => queryClient.invalidateQueries({ queryKey: key }),
+    settle: () =>
+      othersPending()
+        ? undefined
+        : queryClient.invalidateQueries({ queryKey: key }),
   }
 }
 
@@ -181,6 +197,7 @@ const isTarget = (review: Review, target: ReviewTarget) =>
 export function useSaveReview(groupId: string) {
   const optimistic = useOptimisticReviews(groupId)
   return useMutation({
+    ...optimistic.options,
     mutationFn: (input: ReviewFieldsInput & ReviewTarget) =>
       saveReview({ data: { groupId, ...input } }),
     onMutate: (input) =>
@@ -208,6 +225,7 @@ export function useSaveReview(groupId: string) {
 export function useDeleteReview(groupId: string) {
   const optimistic = useOptimisticReviews(groupId)
   return useMutation({
+    ...optimistic.options,
     mutationFn: (input: ReviewTarget) =>
       deleteReview({ data: { groupId, ...input } }),
     onMutate: (input) =>
