@@ -1,6 +1,11 @@
+import { useState } from 'react'
 import { IconStar, IconStarFilled } from '@tabler/icons-react'
-import { RadioGroup as RadioGroupPrimitive } from 'radix-ui'
+import {
+  RadioGroup as RadioGroupPrimitive,
+  ToggleGroup as ToggleGroupPrimitive,
+} from 'radix-ui'
 import { RadioGroup } from '#/components/ui/radio-group'
+import { ToggleGroup } from '#/components/ui/toggle-group'
 import { formatRating } from '#/lib/format'
 import { cn } from '#/lib/utils'
 import { m } from '#/paraglide/messages'
@@ -110,5 +115,73 @@ export function StarRatingInput({
         )
       })}
     </RadioGroup>
+  )
+}
+
+/**
+ * One-click vote for lists: clicking a star saves it right away. Built on
+ * the shadcn toggle group, so arrow keys move between stars without
+ * choosing one until Enter or Space. Hovering previews the rating.
+ */
+export function StarVote({
+  value,
+  onChange,
+  className,
+  ...aria
+}: {
+  /** The viewer's current rating, null when they haven't voted. */
+  value: number | null
+  onChange: (rating: number) => void
+  className?: string
+  'aria-label': string
+}) {
+  const [hovered, setHovered] = useState<number | null>(null)
+  const shown = hovered ?? value ?? 0
+
+  return (
+    <ToggleGroup
+      type="single"
+      spacing={0}
+      value={value ? String(value) : ''}
+      onValueChange={(next) => {
+        setHovered(null)
+        // Re-clicking the chosen star reports '' (deselect); keep the vote.
+        if (next) onChange(Number(next))
+      }}
+      onPointerLeave={() => setHovered(null)}
+      className={className}
+      {...aria}
+    >
+      {STARS.map((star) => {
+        const filled = star <= shown
+        return (
+          <ToggleGroupPrimitive.Item
+            key={star}
+            value={String(star)}
+            aria-label={m.star_count({ count: star })}
+            onPointerEnter={(event) => {
+              // A tap is not a hover; previewing would only flash the stars.
+              if (event.pointerType !== 'touch') setHovered(star)
+            }}
+            className="flex size-7 items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            {/* Both icons stay mounted and only swap visibility: replacing
+                the element under the pointer mid-press would lose the click. */}
+            <IconStarFilled
+              aria-hidden="true"
+              className={cn(
+                'size-4',
+                !filled && 'hidden',
+                hovered === null ? 'text-foreground' : 'text-foreground/60',
+              )}
+            />
+            <IconStar
+              aria-hidden="true"
+              className={cn('size-4 text-foreground/30', filled && 'hidden')}
+            />
+          </ToggleGroupPrimitive.Item>
+        )
+      })}
+    </ToggleGroup>
   )
 }

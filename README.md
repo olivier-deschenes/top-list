@@ -1,6 +1,6 @@
 # Top List
 
-Private group rankings. Make a group, share its link, and let everyone add places (or anything else) and rate them with 1 to 5 stars and a comment. The best one rises to the top.
+Private group rankings. Make a group, share its link, and let everyone add places (or anything else) and rate them with 1 to 5 stars and a comment. The best one rises to the top: the rankings page shows the top three above the full list, and you can rate (or change your rating) straight from either.
 
 - **No accounts.** A group is a random UUID; anyone with the link can view and change it.
 - **Pick a name, no password.** Each device remembers who it is in each group (localStorage). Anyone can act as anyone, by design.

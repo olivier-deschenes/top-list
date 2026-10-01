@@ -20,10 +20,9 @@ import {
   IconArrowDown,
   IconArrowUp,
   IconArrowsSort,
-  IconExternalLink,
   IconStarFilled,
 } from '@tabler/icons-react'
-import { StarRating } from '#/components/star-rating'
+import { StarRating, StarVote } from '#/components/star-rating'
 import { Button } from '#/components/ui/button'
 import {
   Table,
@@ -34,11 +33,13 @@ import {
   TableHeader,
   TableRow,
 } from '#/components/ui/table'
-import { formatRating, linkHost } from '#/lib/format'
+import { formatRating } from '#/lib/format'
 import { compareRanked } from '#/lib/ranking'
 import type { RankedEntry } from '#/lib/ranking'
 import { cn } from '#/lib/utils'
 import { m } from '#/paraglide/messages'
+import { EntryMeta } from './entry-meta'
+import { RankBadge } from './rank-badge'
 import type { LeaderboardSort, SortColumn } from './leaderboard-sort'
 
 interface ColumnMeta {
@@ -98,16 +99,16 @@ const columns = helper.columns([
     id: 'rating',
     sortDescFirst: true,
     sortUndefined: 'last',
-    meta: { label: () => m.col_rating(), numeric: true },
+    meta: { label: () => m.col_rating(), numeric: true, wide: true },
   }),
   helper.accessor((item) => item.reviewCount, {
     id: 'reviews',
     sortDescFirst: true,
-    meta: { label: () => m.col_reviews(), numeric: true },
+    meta: { label: () => m.col_reviews(), numeric: true, wide: true },
   }),
   helper.display({
     id: 'mine',
-    meta: { label: () => m.col_your_rating(), numeric: true, wide: true },
+    meta: { label: () => m.col_your_rating(), numeric: true },
   }),
   helper.accessor((item) => item.entry.createdBy, {
     id: 'addedBy',
@@ -129,6 +130,7 @@ export function Leaderboard({
   groupId,
   data,
   myRatings,
+  onVote,
   query,
   tags,
   sort,
@@ -139,6 +141,7 @@ export function Leaderboard({
   data: Array<RankedEntry>
   /** Entry id to the viewer's own rating. */
   myRatings: Map<string, number>
+  onVote: (entryId: string, rating: number) => void
   query: string
   tags: Array<string>
   sort: LeaderboardSort
@@ -173,9 +176,7 @@ export function Leaderboard({
 
   return (
     <Table className="text-sm">
-      <TableCaption className="sr-only">
-        {m.rankings_caption()}
-      </TableCaption>
+      <TableCaption className="sr-only">{m.rankings_caption()}</TableCaption>
       <TableHeader>
         <TableRow className="hover:bg-transparent">
           {headers.map((header) => {
@@ -197,6 +198,8 @@ export function Leaderboard({
                   meta?.numeric && 'text-right',
                   meta?.wide && 'hidden sm:table-cell',
                   column.id === 'rank' && 'w-12',
+                  // Last visible column on phones.
+                  column.id === 'mine' && 'pr-0 sm:pr-2',
                 )}
               >
                 {column.getCanSort() ? (
@@ -242,7 +245,8 @@ export function Leaderboard({
               key={row.id}
               groupId={groupId}
               item={row.original}
-              myRating={myRatings.get(row.original.entry.id)}
+              myRating={myRatings.get(row.original.entry.id) ?? null}
+              onVote={onVote}
             />
           ))
         )}
@@ -255,16 +259,18 @@ function LeaderboardRow({
   groupId,
   item,
   myRating,
+  onVote,
 }: {
   groupId: string
   item: RankedEntry
-  myRating: number | undefined
+  myRating: number | null
+  onVote: (entryId: string, rating: number) => void
 }) {
   const { entry } = item
   return (
     <TableRow className="align-top">
-      <TableCell className="py-3 pl-0 text-right font-medium tabular-nums">
-        {item.rank ?? ''}
+      <TableCell className="py-3 pl-0 text-right leading-none">
+        <RankBadge rank={item.rank} />
       </TableCell>
       <TableCell className="py-3 whitespace-normal">
         <Link
@@ -274,53 +280,51 @@ function LeaderboardRow({
         >
           {entry.name}
         </Link>
-        {entry.url || entry.tags.length > 0 ? (
-          <p className="mt-0.5 flex flex-wrap gap-x-2 text-xs text-muted-foreground">
-            {entry.url ? (
-              <a
-                href={entry.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-0.5 text-muted-foreground hover:text-foreground"
+        {/* Phones hide the rating and review columns; sum them up here. */}
+        <p className="mt-0.5 text-xs text-muted-foreground sm:hidden">
+          {item.average === null ? (
+            m.not_rated()
+          ) : (
+            <>
+              <span className="sr-only">
+                {m.stars_label({ rating: formatRating(item.average) })}
+              </span>
+              <span
+                aria-hidden="true"
+                className="inline-flex items-center gap-0.5 font-medium text-foreground"
               >
-                {linkHost(entry.url)}
-                <IconExternalLink aria-hidden="true" className="size-3" />
-              </a>
-            ) : null}
-            {entry.tags.length > 0 ? (
-              <span>{entry.tags.join(', ')}</span>
-            ) : null}
-          </p>
-        ) : null}
+                <IconStarFilled className="size-3" />
+                {formatRating(item.average)}
+              </span>
+              {' · '}
+              {m.review_count({ count: item.reviewCount })}
+            </>
+          )}
+        </p>
+        <EntryMeta entry={entry} className="mt-0.5" />
       </TableCell>
-      <TableCell className="py-3 text-right">
+      <TableCell className="hidden py-3 text-right sm:table-cell">
         {item.average === null ? (
           <span className="text-xs text-muted-foreground">{m.not_rated()}</span>
         ) : (
           <span className="inline-flex items-center gap-2">
-            <StarRating
-              value={item.average}
-              className="hidden sm:inline-flex"
-            />
+            <StarRating value={item.average} />
             <span className="font-medium tabular-nums">
               {formatRating(item.average)}
             </span>
           </span>
         )}
       </TableCell>
-      <TableCell className="py-3 text-right tabular-nums">
+      <TableCell className="hidden py-3 text-right tabular-nums sm:table-cell">
         {item.reviewCount}
       </TableCell>
-      <TableCell className="hidden py-3 text-right tabular-nums sm:table-cell">
-        {myRating ? (
-          <span
-            className="inline-flex items-center gap-1"
-            aria-label={m.stars_label({ rating: String(myRating) })}
-          >
-            <IconStarFilled aria-hidden="true" className="size-3" />
-            {myRating}
-          </span>
-        ) : null}
+      <TableCell className="py-2 pr-0 sm:pr-2">
+        <StarVote
+          value={myRating}
+          onChange={(rating) => onVote(entry.id, rating)}
+          aria-label={m.your_rating_of({ name: entry.name })}
+          className="ml-auto"
+        />
       </TableCell>
       <TableCell className="hidden py-3 pr-0 sm:table-cell">
         <Link
