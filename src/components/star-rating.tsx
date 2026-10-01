@@ -1,11 +1,8 @@
 import { useState } from 'react'
 import { IconStar, IconStarFilled } from '@tabler/icons-react'
-import {
-  RadioGroup as RadioGroupPrimitive,
-  ToggleGroup as ToggleGroupPrimitive,
-} from 'radix-ui'
+import { RadioGroup as RadioGroupPrimitive } from 'radix-ui'
 import { RadioGroup } from '#/components/ui/radio-group'
-import { ToggleGroup } from '#/components/ui/toggle-group'
+import { ToggleGroup, ToggleGroupItem } from '#/components/ui/toggle-group'
 import { formatRating } from '#/lib/format'
 import { cn } from '#/lib/utils'
 import { m } from '#/paraglide/messages'
@@ -60,7 +57,8 @@ export function StarRating({
 
 /**
  * Star picker built on the shadcn radio group: arrow keys move between
- * stars and each option is announced as "3 stars".
+ * stars and each option is announced as "3 stars". Items are the Radix
+ * primitive because the shadcn item always draws a radio dot.
  */
 export function StarRatingInput({
   value,
@@ -155,7 +153,7 @@ export function StarVote({
       {STARS.map((star) => {
         const filled = star <= shown
         return (
-          <ToggleGroupPrimitive.Item
+          <ToggleGroupItem
             key={star}
             value={String(star)}
             aria-label={m.star_count({ count: star })}
@@ -163,7 +161,8 @@ export function StarVote({
               // A tap is not a hover; previewing would only flash the stars.
               if (event.pointerType !== 'touch') setHovered(star)
             }}
-            className="flex size-7 items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            // The fill of the stars is the state; no pressed or hover tile.
+            className="size-7 min-w-0 px-0 group-data-[spacing=0]/toggle-group:px-0 hover:bg-transparent data-[state=on]:bg-transparent"
           >
             {/* Both icons stay mounted and only swap visibility: replacing
                 the element under the pointer mid-press would lose the click. */}
@@ -179,7 +178,7 @@ export function StarVote({
               aria-hidden="true"
               className={cn('size-4 text-foreground/30', filled && 'hidden')}
             />
-          </ToggleGroupPrimitive.Item>
+          </ToggleGroupItem>
         )
       })}
     </ToggleGroup>

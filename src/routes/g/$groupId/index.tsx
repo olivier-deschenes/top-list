@@ -132,12 +132,7 @@ function Rankings() {
       ) : (
         <>
           {topThree.length > 0 ? (
-            <TopThree
-              groupId={groupId}
-              items={topThree}
-              myRatings={myRatings}
-              onVote={vote}
-            />
+            <TopThree groupId={groupId} items={topThree} />
           ) : null}
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
