@@ -1,45 +1,53 @@
-import { IconExternalLink } from '@tabler/icons-react'
+import { IconExternalLink, IconMapPinPlus } from '@tabler/icons-react'
 import { Section } from '#/components/page'
 import { Button } from '#/components/ui/button'
-import { googleMapsEmbedUrl, googleMapsUrl, placeQuery } from '#/lib/maps'
+import { googleMapsEmbedUrl, mapPlace } from '#/lib/maps'
+import type { Entry } from '#/lib/types'
 import { m } from '#/paraglide/messages'
 import { getLocale } from '#/paraglide/runtime'
 
 /**
- * Where an entry is: Google's map and place card for its name near its
- * address, and a link to the place's full page in Google Maps.
+ * Where an entry is: Google's map and place card, and a link to the place's
+ * full page in Google Maps. Found by address, then by a pasted Google Maps
+ * link, then by name alone, in which case it asks for an address.
  */
 export function EntryLocation({
-  name,
-  address,
+  entry,
+  onAddAddress,
 }: {
-  name: string
-  address: string
+  entry: Entry
+  onAddAddress: () => void
 }) {
-  const query = placeQuery(name, address)
+  const place = mapPlace(entry)
   return (
     <Section
       id="location"
       title={m.entry_location_title()}
-      description={address}
+      description={
+        entry.address ?? (place.guessed ? m.entry_location_guessed() : null)
+      }
       actions={
-        <Button asChild variant="outline" size="lg">
-          <a
-            href={googleMapsUrl(query)}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {m.entry_open_in_maps()}
-            <IconExternalLink data-icon="inline-end" aria-hidden="true" />
-          </a>
-        </Button>
+        <>
+          {place.guessed ? (
+            <Button variant="outline" size="lg" onClick={onAddAddress}>
+              <IconMapPinPlus data-icon="inline-start" aria-hidden="true" />
+              {m.entry_add_address()}
+            </Button>
+          ) : null}
+          <Button asChild variant="outline" size="lg">
+            <a href={place.href} target="_blank" rel="noopener noreferrer">
+              {m.entry_open_in_maps()}
+              <IconExternalLink data-icon="inline-end" aria-hidden="true" />
+            </a>
+          </Button>
+        </>
       }
     >
       {/* Loads when scrolled to. Google gets only our origin, never the
           page path: a group's link is its only key. */}
       <iframe
-        title={m.entry_map_title({ name })}
-        src={googleMapsEmbedUrl(query, getLocale())}
+        title={m.entry_map_title({ name: entry.name })}
+        src={googleMapsEmbedUrl(place, getLocale())}
         loading="lazy"
         referrerPolicy="strict-origin-when-cross-origin"
         allowFullScreen

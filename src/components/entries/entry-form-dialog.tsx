@@ -57,12 +57,15 @@ export function EntryFormDialog({
   open,
   onOpenChange,
   onSubmit,
+  focusAddress = false,
 }: {
   entry?: Entry
   tagSuggestions: Array<string>
   open: boolean
   onOpenChange: (open: boolean) => void
   onSubmit: (values: EntryFieldsInput) => Promise<void>
+  /** Starts in the address field instead of the name. */
+  focusAddress?: boolean
 }) {
   const tagsId = useId()
   const form = useAppForm({
@@ -109,6 +112,7 @@ export function EntryFormDialog({
                   placeholder={m.field_address_placeholder()}
                   maxLength={LIMITS.address}
                   autoComplete="off"
+                  autoFocus={focusAddress}
                   optional
                 />
               )}
