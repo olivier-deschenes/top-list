@@ -83,7 +83,8 @@ function EntryPage() {
   const { username, requireIdentity, chooseIdentity } = useGroup()
   const updateEntry = useUpdateEntry(groupId)
   const deleteEntry = useDeleteEntry(groupId)
-  const [editOpen, setEditOpen] = useState(false)
+  // Open from Edit, or from the map's "Add address" (focuses that field).
+  const [editing, setEditing] = useState<'entry' | 'address' | null>(null)
   const [deleteOpen, setDeleteOpen] = useState(false)
 
   const rankings = rankEntries(data.entries, data.reviews)
@@ -119,7 +120,7 @@ function EntryPage() {
                 variant="outline"
                 size="lg"
                 onClick={() => {
-                  if (requireIdentity()) setEditOpen(true)
+                  if (requireIdentity()) setEditing('entry')
                 }}
               >
                 <IconPencil data-icon="inline-start" aria-hidden="true" />
@@ -209,9 +210,12 @@ function EntryPage() {
         />
       </div>
 
-      {entry.address ? (
-        <EntryLocation name={entry.name} address={entry.address} />
-      ) : null}
+      <EntryLocation
+        entry={entry}
+        onAddAddress={() => {
+          if (requireIdentity()) setEditing('address')
+        }}
+      />
 
       <Section id="your-review" title={m.your_review_title()}>
         <ClientOnly fallback={<Skeleton className="h-40 max-w-xl" />}>
@@ -256,13 +260,16 @@ function EntryPage() {
         key={`${entry.id}:${entry.updatedAt}`}
         entry={entry}
         tagSuggestions={collectTags(data.entries)}
-        open={editOpen}
-        onOpenChange={setEditOpen}
+        open={editing !== null}
+        onOpenChange={(open) => {
+          if (!open) setEditing(null)
+        }}
+        focusAddress={editing === 'address'}
         onSubmit={async (values) => {
           const actor = requireIdentity()
           if (!actor) return
           await updateEntry.mutateAsync({ ...values, entryId, username: actor })
-          setEditOpen(false)
+          setEditing(null)
           toast.success(m.entry_saved())
         }}
       />
