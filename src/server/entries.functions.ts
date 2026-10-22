@@ -11,6 +11,7 @@ import {
   requireGroup,
   resolveActor,
   touchMember,
+  writeBatch,
 } from './db.server'
 import { deletePhotoObjects, photoIdsWhere } from './photos.server'
 
@@ -21,7 +22,7 @@ export const createEntry = createServerFn({ method: 'POST' })
     const username = await resolveActor(data.groupId, data.username)
     const id = crypto.randomUUID()
     const at = Date.now()
-    await db().batch([
+    await writeBatch([
       touchMember(data.groupId, username, at),
       db()
         .prepare(
@@ -57,7 +58,7 @@ export const updateEntry = createServerFn({ method: 'POST' })
     await requireEntry(data.groupId, data.entryId)
     const username = await resolveActor(data.groupId, data.username)
     const at = Date.now()
-    await db().batch([
+    await writeBatch([
       touchMember(data.groupId, username, at),
       db()
         .prepare(
@@ -93,7 +94,7 @@ export const deleteEntry = createServerFn({ method: 'POST' })
     const username = await resolveActor(data.groupId, data.username)
     const photoIds = await photoIdsWhere('entry_id', data.entryId)
     const at = Date.now()
-    await db().batch([
+    await writeBatch([
       touchMember(data.groupId, username, at),
       // Reviews and photos cascade with the entry.
       db()

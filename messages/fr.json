@@ -242,6 +242,8 @@
   "member_renamed": "Nom mis à jour",
   "error_name_taken": "Quelqu’un dans ce groupe utilise déjà ce nom.",
   "error_photos_full": "Une entrée peut avoir jusqu’à {max} photos.",
+  "error_entries_full": "Un groupe peut avoir jusqu’à {max} entrées.",
+  "error_members_full": "Un groupe peut avoir jusqu’à {max} membres.",
   "error_rate_limited": "Vous allez trop vite. Attendez une minute et réessayez.",
   "member_reviews_title": "Avis",
   "member_entries_title": "Entrées ajoutées",

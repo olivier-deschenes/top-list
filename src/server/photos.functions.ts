@@ -7,6 +7,7 @@ import {
   requireEntry,
   resolveActor,
   touchMember,
+  writeBatch,
 } from './db.server'
 import { deletePhotoObjects, isJpeg, putPhotoObject } from './photos.server'
 
@@ -63,7 +64,7 @@ export const uploadPhotos = createServerFn({ method: 'POST' })
           putPhotoObject(photo.id, 'thumb', photo.thumb),
         ]),
       )
-      await db().batch([
+      await writeBatch([
         touchMember(data.groupId, username, at),
         // A millisecond apart, so they keep their upload order.
         ...photos.map((photo, index) =>
@@ -115,7 +116,7 @@ export const deletePhoto = createServerFn({ method: 'POST' })
 
     const username = await resolveActor(data.groupId, data.username)
     const at = Date.now()
-    await db().batch([
+    await writeBatch([
       db().prepare('DELETE FROM photos WHERE id = ?').bind(data.photoId),
       touchMember(data.groupId, username, at),
       insertActivity({

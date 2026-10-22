@@ -13,6 +13,7 @@ import {
   requireGroup,
   resolveActor,
   touchMember,
+  writeBatch,
 } from './db.server'
 import { deletePhotoObjects, photoIdsWhere } from './photos.server'
 
@@ -28,7 +29,7 @@ export const createGroup = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const id = crypto.randomUUID()
     const at = Date.now()
-    await db().batch([
+    await writeBatch([
       db()
         .prepare(
           `INSERT INTO groups (id, name, description, created_by, created_at, updated_at)
@@ -53,7 +54,7 @@ export const updateGroup = createServerFn({ method: 'POST' })
     await requireGroup(data.groupId)
     const username = await resolveActor(data.groupId, data.username)
     const at = Date.now()
-    await db().batch([
+    await writeBatch([
       db()
         .prepare(
           'UPDATE groups SET name = ?, description = ?, updated_at = ? WHERE id = ?',

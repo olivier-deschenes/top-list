@@ -8,6 +8,7 @@ import {
   insertActivity,
   requireGroup,
   touchMember,
+  writeBatch,
 } from './db.server'
 
 /** Joins (or re-joins) a group and returns the member's stored spelling. */
@@ -18,7 +19,7 @@ export const joinGroup = createServerFn({ method: 'POST' })
     const existing = await findMemberName(data.groupId, data.username)
     const username = existing ?? data.username
     const at = Date.now()
-    await db().batch([
+    await writeBatch([
       touchMember(data.groupId, username, at),
       ...(existing
         ? []
@@ -47,7 +48,7 @@ export const renameMember = createServerFn({ method: 'POST' })
     if (current === data.newUsername) return { username: current }
 
     const at = Date.now()
-    await db().batch([
+    await writeBatch([
       db()
         .prepare(
           'UPDATE members SET username = ?, last_active_at = ? WHERE group_id = ? AND username = ?',

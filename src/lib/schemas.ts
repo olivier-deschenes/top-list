@@ -15,6 +15,9 @@ export const LIMITS = {
   tag: 24,
   tags: 8,
   comment: 1000,
+  /** Per group, also enforced by triggers (migrations/0005_limits.sql). */
+  entries: 500,
+  members: 200,
 } as const
 
 /**

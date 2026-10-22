@@ -1,5 +1,7 @@
 import { env } from 'cloudflare:workers'
 import { notFound } from '@tanstack/react-router'
+import { LIMITS, PHOTOS } from '#/lib/schemas'
+import { m } from '#/paraglide/messages'
 import type {
   ActivityItem,
   ActivityType,
@@ -81,6 +83,26 @@ export const ACTIVITY_COLUMNS =
   'id, username, type, entry_id, entry_name, data, created_at'
 
 export const db = () => env.DB
+
+/** RAISE messages of the cap triggers (migrations/0005_limits.sql). */
+const LIMIT_ERRORS: Record<string, () => string> = {
+  'limit:photos_per_entry': () => m.error_photos_full({ max: PHOTOS.perEntry }),
+  'limit:entries_per_group': () =>
+    m.error_entries_full({ max: LIMITS.entries }),
+  'limit:members_per_group': () =>
+    m.error_members_full({ max: LIMITS.members }),
+}
+
+/** Runs writes as one transaction, turning a cap's trigger into its message. */
+export async function writeBatch(statements: Array<D1PreparedStatement>) {
+  try {
+    return await db().batch(statements)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : ''
+    const code = Object.keys(LIMIT_ERRORS).find((key) => message.includes(key))
+    throw code ? new Error(LIMIT_ERRORS[code]()) : error
+  }
+}
 
 export const toGroup = (row: GroupRow): Group => ({
   id: row.id,

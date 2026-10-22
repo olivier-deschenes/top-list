@@ -6,6 +6,7 @@ import {
   requireEntry,
   resolveActor,
   touchMember,
+  writeBatch,
 } from './db.server'
 
 /** Creates or replaces the member's review of an entry (one per person). */
@@ -15,7 +16,7 @@ export const saveReview = createServerFn({ method: 'POST' })
     const entry = await requireEntry(data.groupId, data.entryId)
     const username = await resolveActor(data.groupId, data.username)
     const at = Date.now()
-    await db().batch([
+    await writeBatch([
       touchMember(data.groupId, username, at),
       db()
         .prepare(
@@ -60,7 +61,7 @@ export const deleteReview = createServerFn({ method: 'POST' })
     if (!existing) return
 
     const at = Date.now()
-    await db().batch([
+    await writeBatch([
       db()
         .prepare('DELETE FROM reviews WHERE entry_id = ? AND username = ?')
         .bind(data.entryId, username),
