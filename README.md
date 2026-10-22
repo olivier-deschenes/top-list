@@ -5,7 +5,8 @@ Private group rankings. Make a group, share its link, and let everyone add place
 - **No accounts.** A group is a random UUID; anyone with the link can view and change it.
 - **Pick a name, no password.** Each device remembers who it is in each group (localStorage). Anyone can act as anyone, by design.
 - **On the map.** Each entry's page shows it on a Google map, with Google's card for the place and a link to it in Google Maps. It finds the place by address, else by a pasted Google Maps link, else by name near you. No API key needed.
-- **Photos.** Add up to 24 photos to an entry and swipe through them. They're resized in the browser before upload, which also strips their metadata (location included).
+- **Photos.** Add up to 24 photos to an entry and swipe through them. They're resized in the browser before upload, which also strips their metadata (location included), and the server stores only their image data.
+- **Limits.** A group holds up to 500 entries and 200 members, and an entry up to 24 photos. Writes are rate-limited per IP (60 a minute, 6 photo uploads a minute).
 - **Tracked per person.** Every entry, review, photo, rename, and delete is attributed and shown in the group's activity feed.
 - **English and French**, following the browser language (with a picker in the footer).
 
