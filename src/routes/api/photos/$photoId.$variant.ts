@@ -5,7 +5,11 @@ import { getPhotoObject } from '#/server/photos.server'
 
 const notFound = () => new Response('Not found', { status: 404 })
 
-/** A photo's image. Ids are never reused, so it caches forever. */
+/**
+ * A photo's image. Ids are never reused, so browsers keep it for good, but
+ * shared caches never store it: once deleted, it stops loading for anyone
+ * who hadn't already seen it.
+ */
 export const Route = createFileRoute('/api/photos/$photoId/$variant')({
   server: {
     handlers: {
@@ -23,7 +27,7 @@ export const Route = createFileRoute('/api/photos/$photoId/$variant')({
           headers: {
             'Content-Type': 'image/jpeg',
             'Content-Length': String(object.size),
-            'Cache-Control': 'public, max-age=31536000, immutable',
+            'Cache-Control': 'private, max-age=31536000, immutable',
             ETag: object.httpEtag,
             // User uploads: never sniffed, run, or embedded by other sites.
             'X-Content-Type-Options': 'nosniff',
