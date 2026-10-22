@@ -1,4 +1,14 @@
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
+import type { Ref } from 'react'
 import { Link } from '@tanstack/react-router'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import { rankItem } from '@tanstack/match-sorter-utils'
 import type { RankingInfo } from '@tanstack/match-sorter-utils'
 import {
@@ -149,7 +159,20 @@ export function Leaderboard({
   onSortChange: (sort: LeaderboardSort) => void
   onClearFilters: () => void
 }) {
-  const sorting: SortingState = [{ id: sort.column, desc: sort.desc }]
+  'use no memo'
+  // The virtualizer's mutable getters must run on every scroll render.
+  const containerRef = useRef<HTMLDivElement>(null)
+  const headerRef = useRef<HTMLTableSectionElement>(null)
+  const [headerHeight, setHeaderHeight] = useState(36)
+  // Scrolling must not invalidate the table's cached sorting and filtering.
+  const sorting = useMemo<SortingState>(
+    () => [{ id: sort.column, desc: sort.desc }],
+    [sort.column, sort.desc],
+  )
+  const columnFilters = useMemo(
+    () => (tags.length > 0 ? [{ id: 'tags', value: tags }] : []),
+    [tags],
+  )
 
   const table = useTable({
     features,
@@ -160,7 +183,7 @@ export function Leaderboard({
     state: {
       sorting,
       globalFilter: query,
-      columnFilters: tags.length > 0 ? [{ id: 'tags', value: tags }] : [],
+      columnFilters,
     },
     onSortingChange: (updater: Updater<SortingState>) => {
       // Sorting removal is disabled, so there is always exactly one column.
@@ -174,12 +197,63 @@ export function Leaderboard({
 
   const headers = table.getHeaderGroups()[0]?.headers ?? []
   const rows = table.getRowModel().rows
+  const getItemKey = useCallback((index: number) => rows[index].id, [rows])
+  const virtualizer = useVirtualizer<HTMLDivElement, HTMLTableRowElement>({
+    count: rows.length,
+    getScrollElement: () => containerRef.current,
+    getItemKey,
+    estimateSize: () => 88,
+    overscan: 8,
+    useAnimationFrameWithResizeObserver: true,
+    scrollMargin: headerHeight,
+    scrollPaddingStart: headerHeight,
+    // Render an initial window on the server as well as before hydration.
+    initialRect: { width: 0, height: 600 },
+  })
+
+  useLayoutEffect(() => {
+    const header = headerRef.current
+    if (!header) return
+    const measureHeader = () =>
+      setHeaderHeight(header.getBoundingClientRect().height)
+    measureHeader()
+    const observer = new ResizeObserver(measureHeader)
+    observer.observe(header)
+    return () => observer.disconnect()
+  }, [])
+
+  const filterKey = JSON.stringify(tags)
+  useEffect(() => {
+    virtualizer.scrollToOffset(0)
+  }, [virtualizer, groupId, query, filterKey, sort.column, sort.desc])
+
+  const virtualRows = virtualizer.getVirtualItems()
+  const paddingTop = Math.max(
+    0,
+    (virtualRows[0]?.start ?? headerHeight) - headerHeight,
+  )
+  const paddingBottom = Math.max(
+    0,
+    virtualizer.getTotalSize() -
+      ((virtualRows.at(-1)?.end ?? headerHeight) - headerHeight),
+  )
 
   return (
-    <Table className="text-sm">
+    <Table
+      className="table-fixed text-sm sm:min-w-2xl"
+      aria-rowcount={rows.length > 0 ? rows.length + 1 : undefined}
+      containerProps={{
+        ref: containerRef,
+        role: 'region',
+        'aria-label': m.rankings_caption(),
+        tabIndex: 0,
+        className:
+          'max-h-[70dvh] overflow-auto [overflow-anchor:none] focus-visible:outline-2 focus-visible:outline-ring',
+      }}
+    >
       <TableCaption className="sr-only">{m.rankings_caption()}</TableCaption>
-      <TableHeader>
-        <TableRow className="hover:bg-transparent">
+      <TableHeader ref={headerRef} className="sticky top-0 z-10 bg-background">
+        <TableRow aria-rowindex={1} className="hover:bg-transparent">
           {headers.map((header) => {
             const { column } = header
             const meta = column.columnDef.meta
@@ -199,8 +273,11 @@ export function Leaderboard({
                   meta?.numeric && 'text-right',
                   meta?.wide && 'hidden sm:table-cell',
                   column.id === 'rank' && 'w-12',
+                  column.id === 'rating' && 'w-32',
+                  column.id === 'reviews' && 'w-20',
+                  column.id === 'addedBy' && 'w-24',
                   // Last visible column on phones.
-                  column.id === 'mine' && 'pr-0 sm:pr-2',
+                  column.id === 'mine' && 'w-40 pr-0 sm:pr-2',
                 )}
               >
                 {column.getCanSort() ? (
@@ -230,26 +307,83 @@ export function Leaderboard({
       <TableBody>
         {rows.length === 0 ? (
           <TableRow className="hover:bg-transparent">
-            <TableCell
-              colSpan={headers.length}
-              className="py-10 pl-0 text-center"
-            >
-              <p className="text-muted-foreground">{m.rankings_no_match()}</p>
-              <Button variant="link" onClick={onClearFilters}>
-                {m.clear_filters()}
-              </Button>
-            </TableCell>
+            {[false, true].map((wide) => (
+              <TableCell
+                key={wide ? 'wide' : 'narrow'}
+                colSpan={
+                  wide
+                    ? headers.length
+                    : headers.filter(
+                        (header) => !header.column.columnDef.meta?.wide,
+                      ).length
+                }
+                className={cn(
+                  'py-10 pl-0 text-center',
+                  wide ? 'hidden sm:table-cell' : 'sm:hidden',
+                )}
+              >
+                <p className="text-muted-foreground">{m.rankings_no_match()}</p>
+                <Button variant="link" onClick={onClearFilters}>
+                  {m.clear_filters()}
+                </Button>
+              </TableCell>
+            ))}
           </TableRow>
         ) : (
-          rows.map((row) => (
-            <LeaderboardRow
-              key={row.id}
-              groupId={groupId}
-              item={row.original}
-              myRating={myRatings.get(row.original.entry.id) ?? null}
-              onVote={onVote}
-            />
-          ))
+          <>
+            {/* Match the responsive cells: a colspan would create extra columns
+                on phones, where the wide columns are hidden. */}
+            {paddingTop > 0 ? (
+              <TableRow
+                aria-hidden="true"
+                className="border-0 hover:bg-transparent"
+                style={{ height: paddingTop }}
+              >
+                {headers.map((header) => (
+                  <TableCell
+                    key={header.id}
+                    className={cn(
+                      'p-0',
+                      header.column.columnDef.meta?.wide &&
+                        'hidden sm:table-cell',
+                    )}
+                  />
+                ))}
+              </TableRow>
+            ) : null}
+            {virtualRows.map((virtualRow) => {
+              const row = rows[virtualRow.index]
+              return (
+                <LeaderboardRow
+                  key={row.id}
+                  ref={virtualizer.measureElement}
+                  index={virtualRow.index}
+                  groupId={groupId}
+                  item={row.original}
+                  myRating={myRatings.get(row.original.entry.id) ?? null}
+                  onVote={onVote}
+                />
+              )
+            })}
+            {paddingBottom > 0 ? (
+              <TableRow
+                aria-hidden="true"
+                className="border-0 hover:bg-transparent"
+                style={{ height: paddingBottom }}
+              >
+                {headers.map((header) => (
+                  <TableCell
+                    key={header.id}
+                    className={cn(
+                      'p-0',
+                      header.column.columnDef.meta?.wide &&
+                        'hidden sm:table-cell',
+                    )}
+                  />
+                ))}
+              </TableRow>
+            ) : null}
+          </>
         )}
       </TableBody>
     </Table>
@@ -257,11 +391,15 @@ export function Leaderboard({
 }
 
 function LeaderboardRow({
+  ref,
+  index,
   groupId,
   item,
   myRating,
   onVote,
 }: {
+  ref: Ref<HTMLTableRowElement>
+  index: number
   groupId: string
   item: RankedEntry
   myRating: number | null
@@ -270,11 +408,11 @@ function LeaderboardRow({
   const { entry } = item
   return (
     // Cells share the first text baseline, however many lines each wraps to.
-    <TableRow>
+    <TableRow ref={ref} data-index={index} aria-rowindex={index + 2}>
       <TableCell className="py-3 pl-0 text-right align-baseline">
         <RankBadge rank={item.rank} />
       </TableCell>
-      <TableCell className="py-3 align-baseline whitespace-normal">
+      <TableCell className="py-3 align-baseline wrap-break-word whitespace-normal">
         <Link
           to="/g/$groupId/entries/$entryId"
           params={{ groupId, entryId: entry.id }}
@@ -328,7 +466,7 @@ function LeaderboardRow({
           className="ml-auto"
         />
       </TableCell>
-      <TableCell className="hidden py-3 pr-0 align-baseline sm:table-cell">
+      <TableCell className="hidden py-3 pr-0 align-baseline wrap-break-word whitespace-normal sm:table-cell">
         <Link
           to="/g/$groupId/members/$username"
           params={{ groupId, username: entry.createdBy }}
