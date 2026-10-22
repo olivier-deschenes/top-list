@@ -9,6 +9,10 @@
       "pattern": "list.odeschenes.dev",
       "custom_domain": true,
     },
+    {
+      "pattern": "list.puuid.com",
+      "custom_domain": true,
+    },
   ],
   "observability": {
     "enabled": true,
