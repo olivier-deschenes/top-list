@@ -131,6 +131,14 @@ function Score({ item, lead = false }: { item: RankedEntry; lead?: boolean }) {
           )}
         >
           {formatRating(item.average)}
+          <span
+            className={cn(
+              'font-normal tracking-normal text-muted-foreground',
+              lead ? 'text-base' : 'text-sm',
+            )}
+          >
+            /10
+          </span>
         </span>
         <StarRating value={item.average} size={lead ? 'md' : 'sm'} />
       </div>

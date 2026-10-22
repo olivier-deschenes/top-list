@@ -86,7 +86,7 @@ function Rankings() {
     if (requireIdentity()) setAddOpen(true)
   }
 
-  /** Saves a star rating from the list, keeping any comment already written. */
+  /** Saves a score picked from the list, keeping any comment already written. */
   const vote = (entryId: string, rating: number) => {
     const actor = requireIdentity()
     if (!actor) return

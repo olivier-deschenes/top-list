@@ -30,9 +30,9 @@ const examples: Record<
 const members = ['Alex', 'Sam', 'Jo'] as const
 // Close scores make a single visitor vote visibly affect the order.
 const baselineRatings = [
-  [5, 4, 4],
-  [4, 4, 4],
-  [4, 4, 3],
+  [10, 8, 8],
+  [8, 8, 8],
+  [8, 8, 6],
 ] as const
 
 export function getDemoEntries(scenario: DemoScenario): Array<Entry> {

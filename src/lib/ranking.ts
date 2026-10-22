@@ -2,12 +2,12 @@ import type { Entry, Member, Review } from './types'
 
 /**
  * Weighted (Bayesian) rating: every entry starts as if it had PRIOR_WEIGHT
- * reviews of PRIOR_RATING, so one 5-star review can't outrank many 4.8s.
+ * reviews of PRIOR_RATING, so one 10/10 review can't outrank many 9.6s.
  * The prior is fixed (not the group mean) so an entry's score only moves
  * when its own reviews change.
  */
 export const PRIOR_WEIGHT = 2
-export const PRIOR_RATING = 3
+export const PRIOR_RATING = 6
 
 export interface RankedEntry {
   entry: Entry
@@ -17,9 +17,14 @@ export interface RankedEntry {
   average: number | null
   /** Bayesian average used for ordering. Null when unrated. */
   score: number | null
-  /** Review counts for 1 to 5 stars, index 0 = 1 star. */
-  distribution: [number, number, number, number, number]
+  /**
+   * Review counts per whole point, index 0 = 1 to 1.5 and index 9 = 10.
+   * Always DISTRIBUTION_SIZE long.
+   */
+  distribution: Array<number>
 }
+
+export const DISTRIBUTION_SIZE = 10
 
 export interface Rankings {
   entries: Array<RankedEntry>
@@ -44,11 +49,11 @@ export function rankEntries(
 
   const scored = entries.map((entry): RankedEntry => {
     const entryReviews = byEntry.get(entry.id) ?? []
-    const distribution: RankedEntry['distribution'] = [0, 0, 0, 0, 0]
+    const distribution = new Array<number>(DISTRIBUTION_SIZE).fill(0)
     let sum = 0
     for (const review of entryReviews) {
       sum += review.rating
-      distribution[review.rating - 1] += 1
+      distribution[Math.floor(review.rating) - 1] += 1
     }
     const reviewCount = entryReviews.length
     return {

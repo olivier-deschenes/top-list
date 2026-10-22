@@ -9,7 +9,7 @@ import { RichMessage } from '#/components/rich-message'
 import { Button } from '#/components/ui/button'
 import { Skeleton } from '#/components/ui/skeleton'
 import { Spinner } from '#/components/ui/spinner'
-import { dayKey, formatDay, formatTime } from '#/lib/format'
+import { dayKey, formatDay, formatScore, formatTime } from '#/lib/format'
 import { activityQuery, groupPageTitle, groupQuery } from '#/lib/queries'
 import { isSameUser } from '#/lib/ranking'
 import type { ActivityItem } from '#/lib/types'
@@ -191,7 +191,10 @@ function describe(item: ActivityItem, user: ReactNode, entry: ReactNode) {
         <RichMessage
           slots={{ username: user, entry }}
           render={(t) =>
-            m.activity_review_saved({ ...t, rating: item.data.rating })
+            m.activity_review_saved({
+              ...t,
+              rating: formatScore(item.data.rating),
+            })
           }
         />
       )

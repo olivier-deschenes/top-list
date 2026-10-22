@@ -26,7 +26,7 @@
   "validation_too_long": "Maximum {max} caractères.",
   "validation_url": "Entrez une adresse web, comme exemple.com.",
   "validation_tags_max": "{max} étiquettes au maximum.",
-  "validation_rating": "Choisissez une note de 1 à 5.",
+  "validation_rating": "Choisissez une note de 1 à 10.",
   "validation_group_link": "Ça ne ressemble pas à un lien ou à un identifiant de groupe.",
 
   "home_title": "Classez tout, ensemble",
@@ -51,12 +51,12 @@
   "demo_movies_group": "Cinéma du vendredi",
   "demo_weekends_group": "Notre prochaine fin de semaine",
   "demo_group_meta": "3 amis · 3 choix",
-  "demo_hint": "Choisissez une étoile. Voyez ce qui change.",
-  "demo_vote_saved": "Vous avez donné {rating}/5 à {name}. Ce choix est maintenant au rang {rank}.",
+  "demo_hint": "Choisissez une note. Voyez ce qui change.",
+  "demo_vote_saved": "Vous avez donné {rating}/10 à {name}. Ce choix est maintenant au rang {rank}.",
   "demo_reset": "Réinitialiser l’exemple",
   "demo_reset_done": "Exemple réinitialisé. Essayez une autre note.",
   "demo_sample_note": "Votes fictifs. Vos changements restent dans cet exemple.",
-  "demo_table_caption": "Exemple de classement. Choisissez des étoiles pour essayer une note.",
+  "demo_table_caption": "Exemple de classement. Choisissez une note pour l’essayer.",
   "demo_entry_aria": "Votre note pour {name} dans cet exemple",
   "create_group_title": "Créer un groupe",
   "create_group_hint": "Vous obtenez un lien privé à partager. Pas de compte, pas de mot de passe.",
@@ -170,18 +170,11 @@
       }
     }
   ],
-  "star_count": [
-    {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
-      "match": {
-        "countPlural=one": "{count} étoile",
-        "countPlural=other": "{count} étoiles"
-      }
-    }
-  ],
-  "stars_label": "{rating} étoiles sur 5",
-  "distribution_caption": "Part des avis par note",
+  "score_label": "{rating} sur 10",
+  "score_placeholder": "Choisir une note",
+  "score_vote_placeholder": "Noter",
+  "score_hint": "Sur 10, demi-points permis.",
+  "distribution_caption": "Part des avis par note, en points entiers",
   "your_review_title": "Votre avis",
   "field_rating": "Note",
   "field_comment": "Commentaire",
@@ -226,7 +219,7 @@
   "activity_entry_created": "{username} a ajouté {entry}",
   "activity_entry_updated": "{username} a modifié {entry}",
   "activity_entry_deleted": "{username} a supprimé {entry}",
-  "activity_review_saved": "{username} a donné {rating} sur 5 à {entry}",
+  "activity_review_saved": "{username} a donné {rating} sur 10 à {entry}",
   "activity_review_deleted": "{username} a retiré son avis sur {entry}",
 
   "settings_title": "Paramètres",

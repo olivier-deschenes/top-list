@@ -32,7 +32,8 @@ import {
   IconArrowsSort,
   IconStarFilled,
 } from '@tabler/icons-react'
-import { StarRating, StarVote } from '#/components/star-rating'
+import { ScoreSelect } from '#/components/score-select'
+import { StarRating } from '#/components/star-rating'
 import { Button } from '#/components/ui/button'
 import {
   Table,
@@ -277,7 +278,7 @@ export function Leaderboard({
                   column.id === 'reviews' && 'w-20',
                   column.id === 'addedBy' && 'w-24',
                   // Last visible column on phones.
-                  column.id === 'mine' && 'w-40 pr-0 sm:pr-2',
+                  column.id === 'mine' && 'w-28 pr-0 sm:pr-2',
                 )}
               >
                 {column.getCanSort() ? (
@@ -427,7 +428,7 @@ function LeaderboardRow({
           ) : (
             <>
               <span className="sr-only">
-                {m.stars_label({ rating: formatRating(item.average) })}
+                {m.score_label({ rating: formatRating(item.average) })}
               </span>
               <span
                 aria-hidden="true"
@@ -459,11 +460,13 @@ function LeaderboardRow({
         {item.reviewCount}
       </TableCell>
       <TableCell className="py-2 pr-0 align-baseline sm:pr-2">
-        <StarVote
+        <ScoreSelect
           value={myRating}
           onChange={(rating) => onVote(entry.id, rating)}
+          placeholder={m.score_vote_placeholder()}
+          size="sm"
           aria-label={m.your_rating_of({ name: entry.name })}
-          className="ml-auto"
+          className="ml-auto w-20"
         />
       </TableCell>
       <TableCell className="hidden py-3 pr-0 align-baseline wrap-break-word whitespace-normal sm:table-cell">

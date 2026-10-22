@@ -1,6 +1,6 @@
 import { useCreateStore, useSelector } from '@tanstack/react-store'
 import { IconRefresh, IconStarFilled } from '@tabler/icons-react'
-import { StarVote } from '#/components/star-rating'
+import { ScoreSelect } from '#/components/score-select'
 import { Button } from '#/components/ui/button'
 import {
   Table,
@@ -12,7 +12,7 @@ import {
   TableRow,
 } from '#/components/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '#/components/ui/tabs'
-import { formatRating } from '#/lib/format'
+import { formatRating, formatScore } from '#/lib/format'
 import { DEMO_SCENARIOS, getDemoRankings } from '#/lib/home-demo'
 import type { DemoScenario } from '#/lib/home-demo'
 import { cn } from '#/lib/utils'
@@ -67,7 +67,10 @@ export function RankingDemo() {
     feedback === 'reset'
       ? m.demo_reset_done()
       : feedback
-        ? m.demo_vote_saved(feedback)
+        ? m.demo_vote_saved({
+            ...feedback,
+            rating: formatScore(feedback.rating),
+          })
         : m.demo_hint()
 
   return (
@@ -146,7 +149,7 @@ export function RankingDemo() {
                       <TableHead className="hidden w-12 px-1 text-right min-[400px]:table-cell">
                         {m.col_rating()}
                       </TableHead>
-                      <TableHead className="w-32 pr-0 text-right sm:w-40">
+                      <TableHead className="w-24 pr-0 text-right">
                         {m.col_your_rating()}
                       </TableHead>
                     </TableRow>
@@ -168,7 +171,7 @@ export function RankingDemo() {
                           <p className="mt-1 text-xs text-muted-foreground">
                             <span className="min-[400px]:hidden">
                               {formatRating(ranked.average!)}
-                              {'/5 · '}
+                              {'/10 · '}
                             </span>
                             {m.review_count({ count: ranked.reviewCount })}
                           </p>
@@ -183,13 +186,15 @@ export function RankingDemo() {
                           </span>
                         </TableCell>
                         <TableCell className="py-5 pr-0 align-baseline">
-                          <StarVote
+                          <ScoreSelect
                             value={ratings[ranked.entry.id] ?? null}
                             onChange={(rating) => vote(ranked.entry.id, rating)}
+                            placeholder={m.score_vote_placeholder()}
+                            size="sm"
                             aria-label={m.demo_entry_aria({
                               name: ranked.entry.name,
                             })}
-                            className="ml-auto [&_button]:size-6 sm:[&_button]:size-7"
+                            className="ml-auto w-20"
                           />
                         </TableCell>
                       </TableRow>

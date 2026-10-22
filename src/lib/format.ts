@@ -30,6 +30,18 @@ export function formatRating(value: number) {
   ).format(value)
 }
 
+/** A single score as picked: "8", "8.5", "8,5". */
+export function formatScore(value: number) {
+  return cached(
+    'score',
+    (locale) =>
+      new Intl.NumberFormat(locale, {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 1,
+      }),
+  ).format(value)
+}
+
 export function formatPercent(value: number) {
   return cached(
     'percent',

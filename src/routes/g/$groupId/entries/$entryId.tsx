@@ -193,6 +193,9 @@ function EntryPage() {
             <>
               <p className="text-5xl font-semibold tracking-tight tabular-nums">
                 {formatRating(ranked.average)}
+                <span className="text-xl font-normal tracking-normal text-muted-foreground">
+                  /10
+                </span>
               </p>
               <StarRating value={ranked.average} size="md" />
               <p className="text-sm text-muted-foreground">

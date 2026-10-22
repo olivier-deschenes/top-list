@@ -26,7 +26,7 @@
   "validation_too_long": "Keep it under {max} characters.",
   "validation_url": "Enter a web address, like example.com.",
   "validation_tags_max": "Up to {max} tags.",
-  "validation_rating": "Pick a rating from 1 to 5.",
+  "validation_rating": "Pick a score from 1 to 10.",
   "validation_group_link": "That doesn’t look like a group link or ID.",
 
   "home_title": "Rank anything with your people",
@@ -51,12 +51,12 @@
   "demo_movies_group": "Friday movie club",
   "demo_weekends_group": "Our next weekend",
   "demo_group_meta": "3 friends · 3 picks",
-  "demo_hint": "Try a star. See what changes.",
-  "demo_vote_saved": "You gave {name} {rating}/5. It’s now #{rank}.",
+  "demo_hint": "Pick a score. See what changes.",
+  "demo_vote_saved": "You gave {name} {rating}/10. It’s now #{rank}.",
   "demo_reset": "Reset example",
   "demo_reset_done": "Example reset. Try another vote.",
   "demo_sample_note": "Sample votes. Your changes stay in this example.",
-  "demo_table_caption": "Example rankings. Choose stars to try a rating.",
+  "demo_table_caption": "Example rankings. Pick a score to try a rating.",
   "demo_entry_aria": "Your example rating for {name}",
   "create_group_title": "Create a group",
   "create_group_hint": "You get a private link to share. No accounts, no passwords.",
@@ -170,18 +170,11 @@
       }
     }
   ],
-  "star_count": [
-    {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
-      "match": {
-        "countPlural=one": "{count} star",
-        "countPlural=other": "{count} stars"
-      }
-    }
-  ],
-  "stars_label": "{rating} out of 5 stars",
-  "distribution_caption": "Share of reviews by rating",
+  "score_label": "{rating} out of 10",
+  "score_placeholder": "Pick a score",
+  "score_vote_placeholder": "Rate",
+  "score_hint": "Out of 10, half points allowed.",
+  "distribution_caption": "Share of reviews by score, in whole points",
   "your_review_title": "Your review",
   "field_rating": "Rating",
   "field_comment": "Comment",
@@ -226,7 +219,7 @@
   "activity_entry_created": "{username} added {entry}",
   "activity_entry_updated": "{username} edited {entry}",
   "activity_entry_deleted": "{username} deleted {entry}",
-  "activity_review_saved": "{username} rated {entry} {rating} out of 5",
+  "activity_review_saved": "{username} rated {entry} {rating} out of 10",
   "activity_review_deleted": "{username} removed their review of {entry}",
 
   "settings_title": "Settings",

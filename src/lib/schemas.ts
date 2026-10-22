@@ -17,6 +17,9 @@ export const LIMITS = {
   comment: 1000,
 } as const
 
+/** Scores are out of 10 in half points: 1, 1.5, … 10. */
+export const RATING = { min: 1, max: 10, step: 0.5 } as const
+
 const requiredError = () => m.validation_required()
 const tooLongError = (max: number) => () => m.validation_too_long({ max })
 
@@ -93,9 +96,9 @@ export const tagsSchema = z
 
 export const ratingSchema = z
   .number({ error: () => m.validation_rating() })
-  .int()
-  .min(1, { error: () => m.validation_rating() })
-  .max(5, { error: () => m.validation_rating() })
+  .min(RATING.min, { error: () => m.validation_rating() })
+  .max(RATING.max, { error: () => m.validation_rating() })
+  .multipleOf(RATING.step, { error: () => m.validation_rating() })
 
 // Server function inputs. Every write names the acting member.
 

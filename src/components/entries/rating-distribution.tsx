@@ -1,10 +1,11 @@
-import { formatPercent } from '#/lib/format'
+import { formatPercent, formatScore } from '#/lib/format'
 import type { RankedEntry } from '#/lib/ranking'
 import { m } from '#/paraglide/messages'
 
 /**
- * Reviews per star rating. Every bar shares one scale (share of all
- * reviews, zero baseline) and carries its count as text.
+ * Reviews per whole point, best first; half points count with the point
+ * below. Every bar shares one scale (share of all reviews, zero baseline)
+ * and carries its count as text.
  */
 export function RatingDistribution({
   distribution,
@@ -13,23 +14,25 @@ export function RatingDistribution({
   distribution: RankedEntry['distribution']
   total: number
 }) {
-  const rows = [5, 4, 3, 2, 1].map((stars) => ({
-    stars,
-    count: distribution[stars - 1],
-    share: total > 0 ? distribution[stars - 1] / total : 0,
-  }))
+  const rows = distribution
+    .map((count, index) => ({
+      point: index + 1,
+      count,
+      share: total > 0 ? count / total : 0,
+    }))
+    .reverse()
 
   return (
     <table className="w-full text-sm">
       <caption className="sr-only">{m.distribution_caption()}</caption>
       <tbody>
         {rows.map((row) => (
-          <tr key={row.stars}>
+          <tr key={row.point}>
             <th
               scope="row"
-              className="w-20 py-1 pr-3 text-left font-normal whitespace-nowrap text-muted-foreground"
+              className="w-8 py-1 pr-3 text-right font-normal whitespace-nowrap text-muted-foreground tabular-nums"
             >
-              {m.star_count({ count: row.stars })}
+              {formatScore(row.point)}
             </th>
             <td className="w-full py-1">
               <div className="h-2 w-full bg-muted" aria-hidden="true">

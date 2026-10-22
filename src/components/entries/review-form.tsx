@@ -2,10 +2,11 @@ import { useId } from 'react'
 import { revalidateLogic } from '@tanstack/react-form'
 import { toast } from 'sonner'
 import { submitHandler, useAppForm } from '#/components/form'
-import { StarRatingInput } from '#/components/star-rating'
+import { ScoreSelect } from '#/components/score-select'
 import { Button } from '#/components/ui/button'
 import {
   Field,
+  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -31,11 +32,12 @@ export function ReviewForm({
   existing: Review | undefined
 }) {
   const ratingLabelId = useId()
+  const ratingHintId = useId()
   const saveReview = useSaveReview(groupId)
   const deleteReview = useDeleteReview(groupId)
 
   const form = useAppForm({
-    // 0 means "no stars picked yet" and fails validation.
+    // 0 means "no score picked yet" and fails validation.
     defaultValues: {
       rating: existing?.rating ?? 0,
       comment: existing?.comment ?? '',
@@ -59,14 +61,19 @@ export function ReviewForm({
                 <FieldLabel id={ratingLabelId} asChild>
                   <span>{m.field_rating()}</span>
                 </FieldLabel>
-                <StarRatingInput
+                <ScoreSelect
                   name={field.name}
                   value={field.state.value || null}
                   onChange={field.handleChange}
                   onBlur={field.handleBlur}
+                  placeholder={m.score_placeholder()}
                   invalid={invalid}
                   aria-labelledby={ratingLabelId}
+                  aria-describedby={ratingHintId}
                 />
+                <FieldDescription id={ratingHintId}>
+                  {m.score_hint()}
+                </FieldDescription>
                 {invalid ? (
                   <FieldError errors={field.state.meta.errors} />
                 ) : null}
