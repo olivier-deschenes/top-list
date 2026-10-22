@@ -9,18 +9,16 @@ import {
   touchMember,
   writeBatch,
 } from './db.server'
-import { deletePhotoObjects, isJpeg, putPhotoObject } from './photos.server'
+import { cleanPhoto, deletePhotoObjects, putPhotoObject } from './photos.server'
 
 /**
  * Adds photos to an entry. Sent as FormData: the actor and entry fields once,
- * then `full`, `thumb`, `width`, and `height` once per photo, in order.
+ * then `full` and `thumb` once per photo, in order.
  */
 export const uploadPhotos = createServerFn({ method: 'POST' })
   .validator((data: FormData) => {
     if (!(data instanceof FormData)) throw new Error('Expected FormData')
     const thumbs = data.getAll('thumb')
-    const widths = data.getAll('width')
-    const heights = data.getAll('height')
     return uploadPhotosInput.parse({
       groupId: data.get('groupId'),
       username: data.get('username'),
@@ -28,8 +26,6 @@ export const uploadPhotos = createServerFn({ method: 'POST' })
       photos: data.getAll('full').map((full, index) => ({
         full,
         thumb: thumbs[index],
-        width: Number(widths[index]),
-        height: Number(heights[index]),
       })),
     })
   })
@@ -37,9 +33,9 @@ export const uploadPhotos = createServerFn({ method: 'POST' })
     const entry = await requireEntry(data.groupId, data.entryId)
     const username = await resolveActor(data.groupId, data.username)
 
-    const files = data.photos.flatMap((photo) => [photo.full, photo.thumb])
-    const valid = await Promise.all(files.map(isJpeg))
-    if (!valid.every(Boolean)) throw new Error(m.validation_photo())
+    const cleaned = await Promise.all(data.photos.map(cleanPhoto))
+    const valid = cleaned.filter((photo) => photo !== null)
+    if (valid.length !== cleaned.length) throw new Error(m.validation_photo())
 
     const existing =
       (await db()
@@ -50,7 +46,7 @@ export const uploadPhotos = createServerFn({ method: 'POST' })
       throw new Error(m.error_photos_full({ max: PHOTOS.perEntry }))
     }
 
-    const photos = data.photos.map((photo) => ({
+    const photos = valid.map((photo) => ({
       ...photo,
       id: crypto.randomUUID(),
     }))

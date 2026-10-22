@@ -22,8 +22,6 @@ export function fitWithin(width: number, height: number, maxEdge: number) {
 export interface PreparedPhoto {
   full: Blob
   thumb: Blob
-  width: number
-  height: number
 }
 
 /**
@@ -38,7 +36,7 @@ export async function preparePhoto(file: File): Promise<PreparedPhoto> {
   try {
     const full = await encode(bitmap, PHOTOS.fullEdge, 0.85)
     const thumb = await encode(bitmap, PHOTOS.thumbEdge, 0.8)
-    return { full: full.blob, thumb: thumb.blob, ...full.size }
+    return { full, thumb }
   } finally {
     bitmap.close()
   }
@@ -60,5 +58,5 @@ async function encode(source: ImageBitmap, maxEdge: number, quality: number) {
     canvas.toBlob(resolve, 'image/jpeg', quality),
   )
   if (!blob) throw new Error('Could not encode the image')
-  return { blob, size }
+  return blob
 }

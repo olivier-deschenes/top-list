@@ -22,8 +22,8 @@ export const LIMITS = {
 
 /**
  * Photos are resized in the browser to JPEGs no longer than these edges
- * (which also drops their metadata, location included), then checked again
- * on the server.
+ * (which also drops their metadata, location included). The server checks
+ * them again and keeps only their image data (src/lib/jpeg.ts).
  */
 export const PHOTOS = {
   perEntry: 24,
@@ -176,8 +176,6 @@ const jpegFile = (maxBytes: number) =>
     .mime('image/jpeg', { error: () => m.validation_photo() })
     .max(maxBytes, { error: () => m.validation_photo() })
 
-const photoEdge = z.number().int().min(1).max(PHOTOS.fullEdge)
-
 export const uploadPhotosInput = z.object({
   ...actor,
   entryId: entryIdSchema,
@@ -186,8 +184,6 @@ export const uploadPhotosInput = z.object({
       z.object({
         full: jpegFile(PHOTOS.fullBytes),
         thumb: jpegFile(PHOTOS.thumbBytes),
-        width: photoEdge,
-        height: photoEdge,
       }),
     )
     .min(1)

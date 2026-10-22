@@ -177,8 +177,6 @@ export function useUploadPhotos(groupId: string) {
       for (const photo of prepared) {
         form.append('full', photo.full, 'full.jpg')
         form.append('thumb', photo.thumb, 'thumb.jpg')
-        form.append('width', String(photo.width))
-        form.append('height', String(photo.height))
       }
       return uploadPhotos({ data: form })
     },
