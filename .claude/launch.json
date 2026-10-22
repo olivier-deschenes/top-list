@@ -4,14 +4,35 @@
     {
       "name": "dev",
       "runtimeExecutable": "bun",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
       "port": 3000
     },
     {
       "name": "preview",
       "runtimeExecutable": "bun",
-      "runtimeArgs": ["run", "preview", "--", "--port", "4173"],
+      "runtimeArgs": [
+        "run",
+        "preview",
+        "--",
+        "--port",
+        "4173"
+      ],
       "port": 4173
+    },
+    {
+      "name": "dev-alt",
+      "runtimeExecutable": "bunx",
+      "runtimeArgs": [
+        "vite",
+        "dev",
+        "--port",
+        "3010",
+        "--strictPort"
+      ],
+      "port": 3010
     }
   ]
 }
