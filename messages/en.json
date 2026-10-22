@@ -79,6 +79,9 @@
   "col_group": "Group",
   "col_you_are": "You are",
   "col_last_visit": "Last visit",
+  "col_actions": "Actions",
+  "your_groups_forget": "Forget {name} on this device",
+  "undo": "Undo",
 
   "nav_label": "Group sections",
   "nav_rankings": "Rankings",
