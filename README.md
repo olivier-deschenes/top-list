@@ -4,6 +4,7 @@ Private group rankings. Make a group, share its link, and let everyone add place
 
 - **No accounts.** A group is a random UUID; anyone with the link can view and change it.
 - **Pick a name, no password.** Each device remembers who it is in each group (localStorage). Anyone can act as anyone, by design.
+- **Finding a group again.** Groups opened on a device are listed on its home page (and can be forgotten there). The invite dialog shows the link as a QR code, and can email the link to an address you enter. The address is used for that one email and isn't stored. Link emails are limited to 3 a minute per IP, per recipient, and per group.
 - **On the map.** Each entry's page shows it on a Google map, with Google's card for the place and a link to it in Google Maps. It finds the place by address, else by a pasted Google Maps link, else by name near you. No API key needed.
 - **Photos.** Add up to 24 photos to an entry and swipe through them. They're resized in the browser before upload, which also strips their metadata (location included), and the server stores only their image data.
 - **Limits.** A group holds up to 500 entries and 200 members, and an entry up to 24 photos. Writes are rate-limited per IP (60 a minute, 6 photo uploads a minute).
@@ -59,6 +60,8 @@ bun run deploy
 ```
 
 Before the first deploy with photos, create the bucket once with `bunx wrangler r2 bucket create top-list-photos`.
+
+Link emails are sent from `noreply@odeschenes.dev` through Cloudflare Email Sending, so that domain must be onboarded once, in the Cloudflare dashboard's Email Sending page or with `bunx wrangler email sending enable odeschenes.dev`. To send from another address, change it in `wrangler.jsonc` (`allowed_sender_addresses`) and `src/server/email.server.ts`. Local dev only simulates sending: the console prints each message and where its text and HTML were saved.
 
 This builds, applies pending migrations to the remote D1 database, and deploys the Worker. Run `bunx wrangler login` first if needed.
 

@@ -5,7 +5,7 @@ import { revalidateLogic } from '@tanstack/react-form'
 import { toast } from 'sonner'
 import { submitHandler, useAppForm } from '#/components/form'
 import { useGroup } from '#/components/group/group-context'
-import { ShareLink } from '#/components/group/invite'
+import { EmailLinkForm, ShareLink } from '#/components/group/invite'
 import { PageHeader, Section } from '#/components/page'
 import {
   AlertDialog,
@@ -75,6 +75,7 @@ function Settings() {
           {m.group_id_label()}{' '}
           <code className="font-mono text-foreground">{groupId}</code>
         </p>
+        <EmailLinkForm groupId={groupId} />
       </Section>
 
       <Section

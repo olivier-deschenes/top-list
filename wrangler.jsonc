@@ -21,6 +21,8 @@
     },
   ],
   // Per-IP budgets for writes (every POST) and photo uploads (src/server.ts).
+  // EMAIL_LIMIT caps link emails per IP, per recipient, and per group
+  // (src/server/groups.functions.ts).
   "ratelimits": [
     {
       "name": "WRITE_LIMIT",
@@ -31,6 +33,19 @@
       "name": "UPLOAD_LIMIT",
       "namespace_id": "7392",
       "simple": { "limit": 6, "period": 60 },
+    },
+    {
+      "name": "EMAIL_LIMIT",
+      "namespace_id": "7393",
+      "simple": { "limit": 3, "period": 60 },
+    },
+  ],
+  // Sends a group's link to an address someone enters. The sender's domain
+  // must be onboarded to Cloudflare Email Sending. Local dev only simulates it.
+  "send_email": [
+    {
+      "name": "EMAIL",
+      "allowed_sender_addresses": ["noreply@odeschenes.dev"],
     },
   ],
   "r2_buckets": [

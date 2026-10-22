@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useHydrated } from '@tanstack/react-router'
+import { revalidateLogic } from '@tanstack/react-form'
 import { IconCheck, IconCopy, IconShare } from '@tabler/icons-react'
 import { QRCodeSVG } from 'qrcode.react'
 import { toast } from 'sonner'
+import { submitHandler, useAppForm } from '#/components/form'
 import { Button } from '#/components/ui/button'
 import {
   Dialog,
@@ -17,6 +19,8 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from '#/components/ui/input-group'
+import { useEmailGroupLink } from '#/lib/queries'
+import { LIMITS, emailLinkSchema } from '#/lib/schemas'
 import { m } from '#/paraglide/messages'
 
 function useGroupUrl(groupId: string) {
@@ -110,6 +114,45 @@ function GroupQrCode({ groupId }: { groupId: string }) {
   )
 }
 
+/** Sends the group link to an address, so it can be found again anywhere. */
+export function EmailLinkForm({ groupId }: { groupId: string }) {
+  const emailLink = useEmailGroupLink(groupId)
+  const form = useAppForm({
+    defaultValues: { email: '' },
+    validationLogic: revalidateLogic(),
+    validators: { onDynamic: emailLinkSchema },
+    onSubmit: async ({ value, formApi }) => {
+      const email = value.email.trim()
+      await emailLink.mutateAsync(email)
+      toast.success(m.email_link_sent({ email }))
+      formApi.reset()
+    },
+  })
+
+  return (
+    <form onSubmit={submitHandler(form)} noValidate className="space-y-3">
+      <form.AppField name="email">
+        {(field) => (
+          <field.TextField
+            label={m.email_link_label()}
+            description={m.email_link_hint()}
+            placeholder={m.email_link_placeholder()}
+            type="email"
+            autoComplete="email"
+            inputMode="email"
+            maxLength={LIMITS.email}
+          />
+        )}
+      </form.AppField>
+      <form.AppForm>
+        <form.SubmitButton variant="outline" className="w-fit">
+          {m.email_link_send()}
+        </form.SubmitButton>
+      </form.AppForm>
+    </form>
+  )
+}
+
 export function InviteDialog({
   groupId,
   groupName,
@@ -130,6 +173,9 @@ export function InviteDialog({
         </DialogHeader>
         <ShareLink groupId={groupId} groupName={groupName} />
         <GroupQrCode groupId={groupId} />
+        <div className="border-t pt-4">
+          <EmailLinkForm groupId={groupId} />
+        </div>
       </DialogContent>
     </Dialog>
   )

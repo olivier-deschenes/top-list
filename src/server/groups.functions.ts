@@ -1,11 +1,17 @@
 import { createServerFn } from '@tanstack/react-start'
-import { setResponseHeader } from '@tanstack/react-start/server'
+import {
+  getRequest,
+  getRequestHeader,
+  setResponseHeader,
+} from '@tanstack/react-start/server'
 import {
   actorInput,
   createGroupInput,
+  emailGroupLinkInput,
   groupIdInput,
   updateGroupInput,
 } from '#/lib/schemas'
+import { m } from '#/paraglide/messages'
 import {
   db,
   insertActivity,
@@ -15,6 +21,7 @@ import {
   touchMember,
   writeBatch,
 } from './db.server'
+import { isEmailRateLimited, sendGroupLink } from './email.server'
 import { deletePhotoObjects, photoIdsWhere } from './photos.server'
 
 export const getGroupSnapshot = createServerFn({ method: 'GET' })
@@ -82,4 +89,22 @@ export const deleteGroup = createServerFn({ method: 'POST' })
       .bind(data.groupId)
       .run()
     await deletePhotoObjects(photoIds)
+  })
+
+export const emailGroupLink = createServerFn({ method: 'POST' })
+  .validator(emailGroupLinkInput)
+  .handler(async ({ data }) => {
+    const ip = getRequestHeader('CF-Connecting-IP') ?? 'local'
+    if (await isEmailRateLimited({ ip, ...data })) {
+      throw new Error(m.error_rate_limited())
+    }
+    const group = await requireGroup(data.groupId)
+    const url = new URL(`/g/${group.id}`, getRequest().url).href
+    try {
+      await sendGroupLink({ to: data.email, groupName: group.name, url })
+    } catch (error) {
+      // The code only (E_SENDER_NOT_VERIFIED, …), never the address.
+      console.error('emailGroupLink failed', (error as { code?: string }).code)
+      throw new Error(m.email_link_failed())
+    }
   })

@@ -25,6 +25,7 @@ interface TextFieldProps {
   description?: ReactNode
   placeholder?: string
   optional?: boolean
+  type?: React.HTMLInputTypeAttribute
   autoComplete?: string
   inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode']
   autoFocus?: boolean
@@ -93,7 +94,9 @@ function TextareaField({
   placeholder,
   rows = 3,
   maxLength,
-}: Omit<TextFieldProps, 'autoComplete' | 'inputMode'> & { rows?: number }) {
+}: Omit<TextFieldProps, 'type' | 'autoComplete' | 'inputMode'> & {
+  rows?: number
+}) {
   const field = useFieldContext<string>()
   const id = useId()
   const invalid = !field.state.meta.isValid

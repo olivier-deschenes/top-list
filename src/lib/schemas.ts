@@ -15,6 +15,7 @@ export const LIMITS = {
   tag: 24,
   tags: 8,
   comment: 1000,
+  email: 254,
   /** Per group, also enforced by triggers (migrations/0005_limits.sql). */
   entries: 500,
   members: 200,
@@ -104,6 +105,10 @@ export const urlSchema = text(LIMITS.url)
   })
   .transform((value) => (value ? toHttpUrl(value) : null))
 
+export const emailSchema = text(LIMITS.email).pipe(
+  z.email({ error: () => m.validation_email() }),
+)
+
 export const tagsSchema = z
   .array(text(LIMITS.tag))
   .transform(normalizeTags)
@@ -138,6 +143,12 @@ export const createGroupInput = groupDetailsSchema.extend({
 export const updateGroupInput = groupDetailsSchema.extend(actor)
 
 export const actorInput = z.object(actor)
+
+export const emailLinkSchema = z.object({ email: emailSchema })
+
+export const emailGroupLinkInput = emailLinkSchema.extend({
+  groupId: groupIdSchema,
+})
 
 export const renameMemberInput = z.object({
   ...actor,

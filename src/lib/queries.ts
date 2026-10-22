@@ -15,6 +15,7 @@ import {
 import {
   createGroup,
   deleteGroup,
+  emailGroupLink,
   getGroupSnapshot,
   updateGroup,
 } from '#/server/groups.functions'
@@ -112,6 +113,13 @@ export function useDeleteGroup(groupId: string) {
       deleteGroup({ data: { groupId, username } }),
     onError: toastError,
     onSuccess: () => queryClient.removeQueries({ queryKey: groupKey(groupId) }),
+  })
+}
+
+export function useEmailGroupLink(groupId: string) {
+  return useMutation({
+    mutationFn: (email: string) => emailGroupLink({ data: { groupId, email } }),
+    onError: toastError,
   })
 }
 
