@@ -18,10 +18,60 @@ async function isRateLimited(request: Request) {
   return !success
 }
 
+const SECURITY_HEADERS = {
+  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  // A group's link is its only key, so other sites never see our paths.
+  'Referrer-Policy': 'same-origin',
+  'Permissions-Policy': 'camera=(), microphone=(), payment=(), usb=()',
+  'Cross-Origin-Opener-Policy': 'same-origin',
+}
+
+/**
+ * Scripts only from our origin or carrying this request's nonce (TanStack
+ * puts it on the scripts SSR writes, see src/router.tsx). Styles allow
+ * inline because components set style attributes. The only frame is the
+ * Google map on an entry's page.
+ */
+const contentSecurityPolicy = (nonce: string) =>
+  [
+    "default-src 'self'",
+    `script-src 'self' 'nonce-${nonce}'`,
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob:",
+    'frame-src https://www.google.com',
+    "object-src 'none'",
+    "base-uri 'none'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
+  ].join('; ')
+
+/** Adds the headers a response doesn't set itself (photos set a stricter CSP). */
+function withSecurityHeaders(response: Response, nonce: string) {
+  const headers = new Headers(response.headers)
+  const policies: Record<string, string> = import.meta.env.DEV
+    ? // Vite's dev client injects inline scripts without the nonce.
+      SECURITY_HEADERS
+    : {
+        ...SECURITY_HEADERS,
+        'Content-Security-Policy': contentSecurityPolicy(nonce),
+      }
+  for (const [name, value] of Object.entries(policies)) {
+    if (!headers.has(name)) headers.set(name, value)
+  }
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  })
+}
+
 // Resolves the request locale (cookie, then Accept-Language) before SSR runs.
 export default {
-  fetch(request: Request): Promise<Response> {
-    return paraglideMiddleware(request, async () => {
+  async fetch(request: Request): Promise<Response> {
+    const nonce = crypto.randomUUID()
+    const response = await paraglideMiddleware(request, async () => {
       if (await isRateLimited(request)) {
         // Plain text: the server function client shows it as the error message.
         return new Response(m.error_rate_limited(), {
@@ -32,7 +82,8 @@ export default {
           },
         })
       }
-      return handler.fetch(request)
+      return handler.fetch(request, { context: { nonce } })
     })
+    return withSecurityHeaders(response, nonce)
   },
 }
