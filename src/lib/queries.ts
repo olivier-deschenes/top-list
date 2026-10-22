@@ -19,7 +19,9 @@ import {
   updateGroup,
 } from '#/server/groups.functions'
 import { joinGroup, renameMember } from '#/server/members.functions'
+import { deletePhoto, uploadPhotos } from '#/server/photos.functions'
 import { deleteReview, saveReview } from '#/server/reviews.functions'
+import { preparePhoto } from './photos'
 import { isSameUser } from './ranking'
 import type {
   EntryFieldsInput,
@@ -145,6 +147,53 @@ export function useDeleteEntry(groupId: string) {
     onSettled: () => {
       void invalidate()
     },
+  })
+}
+
+/**
+ * Resizes the picked files in the browser, then sends them in one request.
+ * A file the browser can't decode fails the whole upload, naming the file.
+ */
+export function useUploadPhotos(groupId: string) {
+  const invalidate = useInvalidateGroup(groupId)
+  return useMutation({
+    mutationFn: async (input: {
+      username: string
+      entryId: string
+      files: Array<File>
+    }) => {
+      const prepared = []
+      for (const file of input.files) {
+        try {
+          prepared.push(await preparePhoto(file))
+        } catch {
+          throw new Error(m.photos_unreadable({ name: file.name }))
+        }
+      }
+      const form = new FormData()
+      form.set('groupId', groupId)
+      form.set('username', input.username)
+      form.set('entryId', input.entryId)
+      for (const photo of prepared) {
+        form.append('full', photo.full, 'full.jpg')
+        form.append('thumb', photo.thumb, 'thumb.jpg')
+        form.append('width', String(photo.width))
+        form.append('height', String(photo.height))
+      }
+      return uploadPhotos({ data: form })
+    },
+    onError: toastError,
+    onSettled: invalidate,
+  })
+}
+
+export function useDeletePhoto(groupId: string) {
+  const invalidate = useInvalidateGroup(groupId)
+  return useMutation({
+    mutationFn: (input: { username: string; photoId: string }) =>
+      deletePhoto({ data: { groupId, ...input } }),
+    onError: toastError,
+    onSettled: invalidate,
   })
 }
 

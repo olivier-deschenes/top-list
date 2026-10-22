@@ -205,5 +205,21 @@ function describe(item: ActivityItem, user: ReactNode, entry: ReactNode) {
           render={(t) => m.activity_review_deleted(t)}
         />
       )
+    case 'photo.added':
+      return (
+        <RichMessage
+          slots={{ username: user, entry }}
+          render={(t) =>
+            m.activity_photos_added({ ...t, count: item.data.count })
+          }
+        />
+      )
+    case 'photo.deleted':
+      return (
+        <RichMessage
+          slots={{ username: user, entry }}
+          render={(t) => m.activity_photo_deleted(t)}
+        />
+      )
   }
 }

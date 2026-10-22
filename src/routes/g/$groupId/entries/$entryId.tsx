@@ -16,6 +16,7 @@ import {
 import { toast } from 'sonner'
 import { EntryFormDialog } from '#/components/entries/entry-form-dialog'
 import { EntryLocation } from '#/components/entries/entry-location'
+import { EntryPhotos } from '#/components/entries/entry-photos'
 import { RatingDistribution } from '#/components/entries/rating-distribution'
 import { ReviewForm } from '#/components/entries/review-form'
 import { useGroup } from '#/components/group/group-context'
@@ -97,6 +98,7 @@ function EntryPage() {
   const reviews = data.reviews
     .filter((review) => review.entryId === entryId)
     .sort((a, b) => b.updatedAt - a.updatedAt)
+  const photos = data.photos.filter((photo) => photo.entryId === entryId)
   const myReview = username
     ? reviews.find((review) => isSameUser(review.username, username))
     : undefined
@@ -211,6 +213,8 @@ function EntryPage() {
           total={ranked.reviewCount}
         />
       </div>
+
+      <EntryPhotos groupId={groupId} entry={entry} photos={photos} />
 
       <EntryLocation
         entry={entry}

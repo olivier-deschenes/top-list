@@ -7,6 +7,7 @@ import type {
   Group,
   GroupSnapshot,
   Member,
+  Photo,
   Review,
 } from '#/lib/types'
 
@@ -49,6 +50,15 @@ export interface ReviewRow {
   updated_at: number
 }
 
+export interface PhotoRow {
+  id: string
+  entry_id: string
+  username: string
+  width: number
+  height: number
+  created_at: number
+}
+
 export interface ActivityRow {
   id: string
   username: string
@@ -66,6 +76,7 @@ const ENTRY_COLUMNS =
   'id, name, address, notes, url, tags, created_by, updated_by, created_at, updated_at'
 const REVIEW_COLUMNS =
   'entry_id, username, rating, comment, created_at, updated_at'
+const PHOTO_COLUMNS = 'id, entry_id, username, width, height, created_at'
 export const ACTIVITY_COLUMNS =
   'id, username, type, entry_id, entry_name, data, created_at'
 
@@ -119,6 +130,15 @@ const toReview = (row: ReviewRow): Review => ({
   updatedAt: row.updated_at,
 })
 
+const toPhoto = (row: PhotoRow): Photo => ({
+  id: row.id,
+  entryId: row.entry_id,
+  username: row.username,
+  width: row.width,
+  height: row.height,
+  createdAt: row.created_at,
+})
+
 export const toActivity = (row: ActivityRow): ActivityItem => ({
   id: row.id,
   username: row.username,
@@ -130,7 +150,7 @@ export const toActivity = (row: ActivityRow): ActivityItem => ({
 })
 
 export async function loadSnapshot(groupId: string): Promise<GroupSnapshot> {
-  const [groups, members, entries, reviews] = await db().batch([
+  const [groups, members, entries, reviews, photos] = await db().batch([
     db()
       .prepare(`SELECT ${GROUP_COLUMNS} FROM groups WHERE id = ?`)
       .bind(groupId),
@@ -149,6 +169,11 @@ export async function loadSnapshot(groupId: string): Promise<GroupSnapshot> {
         `SELECT ${REVIEW_COLUMNS} FROM reviews WHERE group_id = ? ORDER BY updated_at DESC`,
       )
       .bind(groupId),
+    db()
+      .prepare(
+        `SELECT ${PHOTO_COLUMNS} FROM photos WHERE group_id = ? ORDER BY created_at, id`,
+      )
+      .bind(groupId),
   ])
 
   const group = (groups.results as Array<GroupRow>).at(0)
@@ -159,6 +184,7 @@ export async function loadSnapshot(groupId: string): Promise<GroupSnapshot> {
     members: (members.results as Array<MemberRow>).map(toMember),
     entries: (entries.results as Array<EntryRow>).map(toEntry),
     reviews: (reviews.results as Array<ReviewRow>).map(toReview),
+    photos: (photos.results as Array<PhotoRow>).map(toPhoto),
   }
 }
 

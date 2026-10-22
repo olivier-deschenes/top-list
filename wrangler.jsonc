@@ -20,4 +20,10 @@
       "database_id": "ac6502c6-3187-4428-8ef2-5a65515a528c",
     },
   ],
+  "r2_buckets": [
+    {
+      "binding": "PHOTOS",
+      "bucket_name": "top-list-photos",
+    },
+  ],
 }

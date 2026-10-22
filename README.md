@@ -5,12 +5,13 @@ Private group rankings. Make a group, share its link, and let everyone add place
 - **No accounts.** A group is a random UUID; anyone with the link can view and change it.
 - **Pick a name, no password.** Each device remembers who it is in each group (localStorage). Anyone can act as anyone, by design.
 - **On the map.** Each entry's page shows it on a Google map, with Google's card for the place and a link to it in Google Maps. It finds the place by address, else by a pasted Google Maps link, else by name near you. No API key needed.
-- **Tracked per person.** Every entry, review, rename, and delete is attributed and shown in the group's activity feed.
+- **Photos.** Add up to 24 photos to an entry and swipe through them. They're resized in the browser before upload, which also strips their metadata (location included).
+- **Tracked per person.** Every entry, review, photo, rename, and delete is attributed and shown in the group's activity feed.
 - **English and French**, following the browser language (with a picker in the footer).
 
 ## Stack
 
-TanStack Start (React 19, SSR) on Cloudflare Workers, Cloudflare D1 for storage, TanStack Router/Query/Form/Table/DB, shadcn/ui + Tailwind CSS, Paraglide for i18n.
+TanStack Start (React 19, SSR) on Cloudflare Workers, Cloudflare D1 for data and R2 for photos, TanStack Router/Query/Form/Table/DB, shadcn/ui + Tailwind CSS, Paraglide for i18n.
 
 | Path                  | What                                                                        |
 | --------------------- | --------------------------------------------------------------------------- |
@@ -21,6 +22,7 @@ TanStack Start (React 19, SSR) on Cloudflare Workers, Cloudflare D1 for storage,
 | `src/lib/queries.ts`  | TanStack Query options and mutation hooks                                   |
 | `src/db-collections/` | Device-local "your groups" and identity (TanStack DB, localStorage)         |
 | `src/routes/`         | Pages: home, `/g/$groupId` (rankings, entries, members, activity, settings) |
+| `src/routes/api/`     | Photo images served from R2 (`/api/photos/$photoId/full` or `/thumb`)       |
 | `messages/`           | `en.json` and `fr.json` UI strings                                          |
 
 ### Ranking
@@ -36,7 +38,7 @@ bun run db:migrate:local
 bun run dev
 ```
 
-The app runs at http://localhost:3000 with a local D1 database in `.wrangler/state`.
+The app runs at http://localhost:3000 with a local D1 database and R2 bucket in `.wrangler/state`.
 
 ```bash
 bun run test        # unit tests (Vitest)
@@ -55,6 +57,8 @@ Live at https://list.odeschenes.dev.
 bun run deploy
 ```
 
+Before the first deploy with photos, create the bucket once with `bunx wrangler r2 bucket create top-list-photos`.
+
 This builds, applies pending migrations to the remote D1 database, and deploys the Worker. Run `bunx wrangler login` first if needed.
 
-To deploy to a different Cloudflare account, create a database with `bunx wrangler d1 create top-list` and put its id in `wrangler.jsonc` as the `DB` binding's `database_id`. Keep a single `DB` entry without `"remote": true`, so local dev keeps using the local database.
+To deploy to a different Cloudflare account, create a database with `bunx wrangler d1 create top-list` and put its id in `wrangler.jsonc` as the `DB` binding's `database_id`, and create the photos bucket as above. Keep a single `DB` entry without `"remote": true`, so local dev keeps using the local database.

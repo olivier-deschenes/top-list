@@ -12,6 +12,7 @@ import {
   resolveActor,
   touchMember,
 } from './db.server'
+import { deletePhotoObjects, photoIdsWhere } from './photos.server'
 
 export const createEntry = createServerFn({ method: 'POST' })
   .validator(createEntryInput)
@@ -90,10 +91,11 @@ export const deleteEntry = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const entry = await requireEntry(data.groupId, data.entryId)
     const username = await resolveActor(data.groupId, data.username)
+    const photoIds = await photoIdsWhere('entry_id', data.entryId)
     const at = Date.now()
     await db().batch([
       touchMember(data.groupId, username, at),
-      // Reviews cascade with the entry.
+      // Reviews and photos cascade with the entry.
       db()
         .prepare('DELETE FROM entries WHERE id = ? AND group_id = ?')
         .bind(data.entryId, data.groupId),
@@ -106,4 +108,5 @@ export const deleteEntry = createServerFn({ method: 'POST' })
         at,
       }),
     ])
+    await deletePhotoObjects(photoIds)
   })

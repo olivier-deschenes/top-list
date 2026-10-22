@@ -14,6 +14,7 @@ import {
   resolveActor,
   touchMember,
 } from './db.server'
+import { deletePhotoObjects, photoIdsWhere } from './photos.server'
 
 export const getGroupSnapshot = createServerFn({ method: 'GET' })
   .validator(groupIdInput)
@@ -73,9 +74,11 @@ export const deleteGroup = createServerFn({ method: 'POST' })
   .validator(actorInput)
   .handler(async ({ data }) => {
     await requireGroup(data.groupId)
-    // Members, entries, reviews, and activity cascade.
+    const photoIds = await photoIdsWhere('group_id', data.groupId)
+    // Members, entries, reviews, photos, and activity cascade.
     await db()
       .prepare('DELETE FROM groups WHERE id = ?')
       .bind(data.groupId)
       .run()
+    await deletePhotoObjects(photoIds)
   })

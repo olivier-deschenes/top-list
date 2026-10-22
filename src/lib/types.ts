@@ -37,11 +37,22 @@ export interface Review {
   updatedAt: number
 }
 
+/** A photo of an entry. Its image is served by `photoUrl`. */
+export interface Photo {
+  id: string
+  entryId: string
+  username: string
+  width: number
+  height: number
+  createdAt: number
+}
+
 export interface GroupSnapshot {
   group: Group
   members: Array<Member>
   entries: Array<Entry>
   reviews: Array<Review>
+  photos: Array<Photo>
 }
 
 interface ActivityBase {
@@ -63,6 +74,8 @@ export type ActivityItem = ActivityBase &
       }
     | { type: 'review.saved'; data: { rating: number } }
     | { type: 'review.deleted'; data: null }
+    | { type: 'photo.added'; data: { count: number } }
+    | { type: 'photo.deleted'; data: null }
   )
 
 export type ActivityType = ActivityItem['type']

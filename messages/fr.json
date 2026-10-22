@@ -28,6 +28,8 @@
   "validation_tags_max": "{max} étiquettes au maximum.",
   "validation_rating": "Choisissez une note de 1 à 10.",
   "validation_group_link": "Ça ne ressemble pas à un lien ou à un identifiant de groupe.",
+  "validation_photo": "Cette photo n’a pas pu être envoyée. Essayez-en une autre.",
+  "validation_photos_max": "{max} photos à la fois au maximum.",
 
   "home_title": "Classez tout, ensemble",
   "home_lede": "Créez un groupe, partagez le lien et notez ensemble vos cafés, films ou idées de sorties. Les favoris du groupe montent en tête.",
@@ -146,7 +148,7 @@
   "entry_saved": "Entrée enregistrée",
   "entry_deleted": "Entrée supprimée",
   "entry_delete_title": "Supprimer {name} ?",
-  "entry_delete_body": "L’entrée et tous ses avis seront supprimés pour tout le monde.",
+  "entry_delete_body": "L’entrée, tous ses avis et ses photos seront supprimés pour tout le monde.",
   "entry_not_found_title": "Entrée introuvable",
   "entry_not_found_body": "Elle a peut-être été supprimée.",
   "entry_back": "Tout le classement",
@@ -159,6 +161,40 @@
   "entry_location_guessed": "Trouvé par le nom près de vous, ce n’est peut-être pas le bon endroit.",
   "entry_add_address": "Ajouter l’adresse",
   "entry_map_title": "Carte de {name}",
+
+  "photos_title": "Photos",
+  "photos_add": "Ajouter des photos",
+  "photos_empty": "Aucune photo pour l’instant.",
+  "photos_full": "Cette entrée a atteint le maximum de photos ({max}).",
+  "photos_uploading": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Envoi de 1 photo",
+        "countPlural=other": "Envoi de {count} photos"
+      }
+    }
+  ],
+  "photos_added": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Photo ajoutée",
+        "countPlural=other": "{count} photos ajoutées"
+      }
+    }
+  ],
+  "photos_unreadable": "Impossible de lire {name}. Essayez un JPEG ou un PNG.",
+  "photo_alt": "Photo de {name} par {username}",
+  "photo_added_by": "Ajoutée par {username}",
+  "photo_position": "{index} sur {total}",
+  "photo_previous": "Photo précédente",
+  "photo_next": "Photo suivante",
+  "photo_deleted": "Photo supprimée",
+  "photo_delete_title": "Supprimer cette photo ?",
+  "photo_delete_body": "Elle sera supprimée pour tout le monde.",
 
   "review_count": [
     {
@@ -205,6 +241,7 @@
   "field_new_name": "Nouveau nom",
   "member_renamed": "Nom mis à jour",
   "error_name_taken": "Quelqu’un dans ce groupe utilise déjà ce nom.",
+  "error_photos_full": "Une entrée peut avoir jusqu’à {max} photos.",
   "member_reviews_title": "Avis",
   "member_entries_title": "Entrées ajoutées",
   "member_no_reviews": "Aucun avis pour l’instant.",
@@ -222,6 +259,22 @@
   "activity_entry_deleted": "{username} a supprimé {entry}",
   "activity_review_saved": "{username} a donné {rating} sur 10 à {entry}",
   "activity_review_deleted": "{username} a retiré son avis sur {entry}",
+  "activity_photos_added": [
+    {
+      "declarations": [
+        "input count",
+        "input username",
+        "input entry",
+        "local countPlural = count: plural"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{username} a ajouté une photo de {entry}",
+        "countPlural=other": "{username} a ajouté {count} photos de {entry}"
+      }
+    }
+  ],
+  "activity_photo_deleted": "{username} a supprimé une photo de {entry}",
 
   "settings_title": "Paramètres",
   "settings_details_title": "Détails du groupe",

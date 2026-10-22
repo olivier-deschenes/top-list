@@ -14,6 +14,7 @@ import { Route as GGroupIdRouteRouteImport } from './routes/g/$groupId/route'
 import { Route as GGroupIdIndexRouteImport } from './routes/g/$groupId/index'
 import { Route as GGroupIdActivityRouteImport } from './routes/g/$groupId/activity'
 import { Route as GGroupIdSettingsRouteImport } from './routes/g/$groupId/settings'
+import { Route as ApiPhotosPhotoIdVariantRouteImport } from './routes/api/photos/$photoId.$variant'
 import { Route as GGroupIdEntriesEntryIdRouteImport } from './routes/g/$groupId/entries/$entryId'
 import { Route as GGroupIdMembersIndexRouteImport } from './routes/g/$groupId/members/index'
 import { Route as GGroupIdMembersUsernameRouteImport } from './routes/g/$groupId/members/$username'
@@ -43,6 +44,11 @@ const GGroupIdSettingsRoute = GGroupIdSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => GGroupIdRouteRoute,
 } as any)
+const ApiPhotosPhotoIdVariantRoute = ApiPhotosPhotoIdVariantRouteImport.update({
+  id: '/api/photos/$photoId/$variant',
+  path: '/api/photos/$photoId/$variant',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GGroupIdEntriesEntryIdRoute = GGroupIdEntriesEntryIdRouteImport.update({
   id: '/entries/$entryId',
   path: '/entries/$entryId',
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/g/$groupId/activity': typeof GGroupIdActivityRoute
   '/g/$groupId/settings': typeof GGroupIdSettingsRoute
   '/g/$groupId/': typeof GGroupIdIndexRoute
+  '/api/photos/$photoId/$variant': typeof ApiPhotosPhotoIdVariantRoute
   '/g/$groupId/entries/$entryId': typeof GGroupIdEntriesEntryIdRoute
   '/g/$groupId/members/$username': typeof GGroupIdMembersUsernameRoute
   '/g/$groupId/members/': typeof GGroupIdMembersIndexRoute
@@ -74,6 +81,7 @@ export interface FileRoutesByTo {
   '/g/$groupId/activity': typeof GGroupIdActivityRoute
   '/g/$groupId/settings': typeof GGroupIdSettingsRoute
   '/g/$groupId': typeof GGroupIdIndexRoute
+  '/api/photos/$photoId/$variant': typeof ApiPhotosPhotoIdVariantRoute
   '/g/$groupId/entries/$entryId': typeof GGroupIdEntriesEntryIdRoute
   '/g/$groupId/members/$username': typeof GGroupIdMembersUsernameRoute
   '/g/$groupId/members': typeof GGroupIdMembersIndexRoute
@@ -85,6 +93,7 @@ export interface FileRoutesById {
   '/g/$groupId/activity': typeof GGroupIdActivityRoute
   '/g/$groupId/settings': typeof GGroupIdSettingsRoute
   '/g/$groupId/': typeof GGroupIdIndexRoute
+  '/api/photos/$photoId/$variant': typeof ApiPhotosPhotoIdVariantRoute
   '/g/$groupId/entries/$entryId': typeof GGroupIdEntriesEntryIdRoute
   '/g/$groupId/members/$username': typeof GGroupIdMembersUsernameRoute
   '/g/$groupId/members/': typeof GGroupIdMembersIndexRoute
@@ -97,6 +106,7 @@ export interface FileRouteTypes {
     | '/g/$groupId/activity'
     | '/g/$groupId/settings'
     | '/g/$groupId/'
+    | '/api/photos/$photoId/$variant'
     | '/g/$groupId/entries/$entryId'
     | '/g/$groupId/members/$username'
     | '/g/$groupId/members/'
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/g/$groupId/activity'
     | '/g/$groupId/settings'
     | '/g/$groupId'
+    | '/api/photos/$photoId/$variant'
     | '/g/$groupId/entries/$entryId'
     | '/g/$groupId/members/$username'
     | '/g/$groupId/members'
@@ -116,6 +127,7 @@ export interface FileRouteTypes {
     | '/g/$groupId/activity'
     | '/g/$groupId/settings'
     | '/g/$groupId/'
+    | '/api/photos/$photoId/$variant'
     | '/g/$groupId/entries/$entryId'
     | '/g/$groupId/members/$username'
     | '/g/$groupId/members/'
@@ -124,6 +136,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   GGroupIdRouteRoute: typeof GGroupIdRouteRouteWithChildren
+  ApiPhotosPhotoIdVariantRoute: typeof ApiPhotosPhotoIdVariantRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -162,6 +175,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/g/$groupId/settings'
       preLoaderRoute: typeof GGroupIdSettingsRouteImport
       parentRoute: typeof GGroupIdRouteRoute
+    }
+    '/api/photos/$photoId/$variant': {
+      id: '/api/photos/$photoId/$variant'
+      path: '/api/photos/$photoId/$variant'
+      fullPath: '/api/photos/$photoId/$variant'
+      preLoaderRoute: typeof ApiPhotosPhotoIdVariantRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/g/$groupId/entries/$entryId': {
       id: '/g/$groupId/entries/$entryId'
@@ -212,6 +232,7 @@ const GGroupIdRouteRouteWithChildren = GGroupIdRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   GGroupIdRouteRoute: GGroupIdRouteRouteWithChildren,
+  ApiPhotosPhotoIdVariantRoute: ApiPhotosPhotoIdVariantRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

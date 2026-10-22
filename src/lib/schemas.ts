@@ -17,6 +17,20 @@ export const LIMITS = {
   comment: 1000,
 } as const
 
+/**
+ * Photos are resized in the browser to JPEGs no longer than these edges
+ * (which also drops their metadata, location included), then checked again
+ * on the server.
+ */
+export const PHOTOS = {
+  perEntry: 24,
+  perUpload: 10,
+  fullEdge: 2048,
+  thumbEdge: 640,
+  fullBytes: 4 * 1024 * 1024,
+  thumbBytes: 512 * 1024,
+} as const
+
 /** Scores are out of 10 in half points: 1, 1.5, … 10. */
 export const RATING = { min: 1, max: 10, step: 0.5 } as const
 
@@ -152,6 +166,36 @@ export const saveReviewInput = reviewFieldsSchema.extend({
   ...actor,
   entryId: entryIdSchema,
 })
+
+const jpegFile = (maxBytes: number) =>
+  z
+    .file({ error: () => m.validation_photo() })
+    .mime('image/jpeg', { error: () => m.validation_photo() })
+    .max(maxBytes, { error: () => m.validation_photo() })
+
+const photoEdge = z.number().int().min(1).max(PHOTOS.fullEdge)
+
+export const uploadPhotosInput = z.object({
+  ...actor,
+  entryId: entryIdSchema,
+  photos: z
+    .array(
+      z.object({
+        full: jpegFile(PHOTOS.fullBytes),
+        thumb: jpegFile(PHOTOS.thumbBytes),
+        width: photoEdge,
+        height: photoEdge,
+      }),
+    )
+    .min(1)
+    .max(PHOTOS.perUpload, {
+      error: () => m.validation_photos_max({ max: PHOTOS.perUpload }),
+    }),
+})
+
+export const photoIdSchema = z.uuid()
+
+export const photoActionInput = z.object({ ...actor, photoId: photoIdSchema })
 
 export const activityPageInput = z.object({
   groupId: groupIdSchema,
