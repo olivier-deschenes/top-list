@@ -32,7 +32,7 @@ import {
   IconArrowsSort,
   IconStarFilled,
 } from '@tabler/icons-react'
-import { ScoreSelect } from '#/components/score-select'
+import { ScorePicker } from '#/components/score-input'
 import { StarRating } from '#/components/star-rating'
 import { Button } from '#/components/ui/button'
 import {
@@ -460,13 +460,12 @@ function LeaderboardRow({
         {item.reviewCount}
       </TableCell>
       <TableCell className="py-2 pr-0 align-baseline sm:pr-2">
-        <ScoreSelect
+        <ScorePicker
           value={myRating}
           onChange={(rating) => onVote(entry.id, rating)}
           placeholder={m.score_vote_placeholder()}
-          size="sm"
-          aria-label={m.your_rating_of({ name: entry.name })}
-          className="ml-auto w-20"
+          label={m.your_rating_of({ name: entry.name })}
+          className="ml-auto"
         />
       </TableCell>
       <TableCell className="hidden py-3 pr-0 align-baseline wrap-break-word whitespace-normal sm:table-cell">

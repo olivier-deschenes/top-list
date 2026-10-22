@@ -171,9 +171,10 @@
     }
   ],
   "score_label": "{rating} sur 10",
-  "score_placeholder": "Choisir une note",
   "score_vote_placeholder": "Noter",
-  "score_hint": "Sur 10, demi-points permis.",
+  "score_hint": "Sur 10, par demi-points. Glissez, puis ajustez avec − et +.",
+  "score_lower": "Un demi-point de moins",
+  "score_raise": "Un demi-point de plus",
   "distribution_caption": "Part des avis par note, en points entiers",
   "your_review_title": "Votre avis",
   "field_rating": "Note",

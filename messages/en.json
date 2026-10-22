@@ -171,9 +171,10 @@
     }
   ],
   "score_label": "{rating} out of 10",
-  "score_placeholder": "Pick a score",
   "score_vote_placeholder": "Rate",
-  "score_hint": "Out of 10, half points allowed.",
+  "score_hint": "Out of 10 in half points. Drag, then fine-tune with − and +.",
+  "score_lower": "Half a point lower",
+  "score_raise": "Half a point higher",
   "distribution_caption": "Share of reviews by score, in whole points",
   "your_review_title": "Your review",
   "field_rating": "Rating",

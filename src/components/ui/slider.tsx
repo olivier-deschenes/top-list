@@ -1,6 +1,6 @@
-import * as React from "react"
-import { cn } from "cn"
-import { Slider as SliderPrimitive } from "radix-ui"
+import * as React from 'react'
+import { cn } from 'cn'
+import { Slider as SliderPrimitive } from 'radix-ui'
 
 function Slider({
   className,
@@ -8,8 +8,12 @@ function Slider({
   value,
   min = 0,
   max = 100,
+  thumbProps,
   ...props
-}: React.ComponentProps<typeof SliderPrimitive.Root>) {
+}: React.ComponentProps<typeof SliderPrimitive.Root> & {
+  /** Applied to every thumb: its accessible name and value text live there. */
+  thumbProps?: React.ComponentProps<typeof SliderPrimitive.Thumb>
+}) {
   const _values = React.useMemo(
     () =>
       Array.isArray(value)
@@ -17,7 +21,7 @@ function Slider({
         : Array.isArray(defaultValue)
           ? defaultValue
           : [min, max],
-    [value, defaultValue, min, max]
+    [value, defaultValue, min, max],
   )
 
   return (
@@ -28,8 +32,8 @@ function Slider({
       min={min}
       max={max}
       className={cn(
-        "relative flex w-full touch-none items-center select-none data-disabled:opacity-50 data-vertical:h-full data-vertical:min-h-40 data-vertical:w-auto data-vertical:flex-col",
-        className
+        'relative flex w-full touch-none items-center select-none data-disabled:opacity-50 data-vertical:h-full data-vertical:min-h-40 data-vertical:w-auto data-vertical:flex-col',
+        className,
       )}
       {...props}
     >
@@ -46,7 +50,11 @@ function Slider({
         <SliderPrimitive.Thumb
           data-slot="slider-thumb"
           key={index}
-          className="relative block size-3 shrink-0 rounded-none border border-ring bg-white ring-ring/50 transition-[color,box-shadow] select-none after:absolute after:-inset-2 hover:ring-1 focus-visible:ring-1 focus-visible:outline-hidden active:ring-1 disabled:pointer-events-none disabled:opacity-50"
+          {...thumbProps}
+          className={cn(
+            'relative block size-3 shrink-0 rounded-none border border-ring bg-white ring-ring/50 transition-[color,box-shadow] select-none after:absolute after:-inset-2 hover:ring-1 focus-visible:ring-1 focus-visible:outline-hidden active:ring-1 disabled:pointer-events-none disabled:opacity-50',
+            thumbProps?.className,
+          )}
         />
       ))}
     </SliderPrimitive.Root>

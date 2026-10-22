@@ -2,7 +2,7 @@ import { useId } from 'react'
 import { revalidateLogic } from '@tanstack/react-form'
 import { toast } from 'sonner'
 import { submitHandler, useAppForm } from '#/components/form'
-import { ScoreSelect } from '#/components/score-select'
+import { ScoreSlider } from '#/components/score-input'
 import { Button } from '#/components/ui/button'
 import {
   Field,
@@ -61,12 +61,11 @@ export function ReviewForm({
                 <FieldLabel id={ratingLabelId} asChild>
                   <span>{m.field_rating()}</span>
                 </FieldLabel>
-                <ScoreSelect
+                <ScoreSlider
                   name={field.name}
                   value={field.state.value || null}
-                  onChange={field.handleChange}
+                  onValueChange={field.handleChange}
                   onBlur={field.handleBlur}
-                  placeholder={m.score_placeholder()}
                   invalid={invalid}
                   aria-labelledby={ratingLabelId}
                   aria-describedby={ratingHintId}

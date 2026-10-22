@@ -1,6 +1,6 @@
 import { useCreateStore, useSelector } from '@tanstack/react-store'
 import { IconRefresh, IconStarFilled } from '@tabler/icons-react'
-import { ScoreSelect } from '#/components/score-select'
+import { ScorePicker } from '#/components/score-input'
 import { Button } from '#/components/ui/button'
 import {
   Table,
@@ -186,15 +186,14 @@ export function RankingDemo() {
                           </span>
                         </TableCell>
                         <TableCell className="py-5 pr-0 align-baseline">
-                          <ScoreSelect
+                          <ScorePicker
                             value={ratings[ranked.entry.id] ?? null}
                             onChange={(rating) => vote(ranked.entry.id, rating)}
                             placeholder={m.score_vote_placeholder()}
-                            size="sm"
-                            aria-label={m.demo_entry_aria({
+                            label={m.demo_entry_aria({
                               name: ranked.entry.name,
                             })}
-                            className="ml-auto w-20"
+                            className="ml-auto"
                           />
                         </TableCell>
                       </TableRow>
