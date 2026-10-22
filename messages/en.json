@@ -242,6 +242,7 @@
   "member_renamed": "Name updated",
   "error_name_taken": "Someone in this group already uses that name.",
   "error_photos_full": "An entry can have up to {max} photos.",
+  "error_rate_limited": "You’re going too fast. Wait a minute and try again.",
   "member_reviews_title": "Reviews",
   "member_entries_title": "Entries added",
   "member_no_reviews": "No reviews yet.",

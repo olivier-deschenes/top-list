@@ -20,6 +20,19 @@
       "database_id": "ac6502c6-3187-4428-8ef2-5a65515a528c",
     },
   ],
+  // Per-IP budgets for writes (every POST) and photo uploads (src/server.ts).
+  "ratelimits": [
+    {
+      "name": "WRITE_LIMIT",
+      "namespace_id": "7391",
+      "simple": { "limit": 60, "period": 60 },
+    },
+    {
+      "name": "UPLOAD_LIMIT",
+      "namespace_id": "7392",
+      "simple": { "limit": 6, "period": 60 },
+    },
+  ],
   "r2_buckets": [
     {
       "binding": "PHOTOS",
