@@ -26,12 +26,7 @@ import {
   useTable,
 } from '@tanstack/react-table'
 import type { Row, SortingState, Updater } from '@tanstack/react-table'
-import {
-  IconArrowDown,
-  IconArrowUp,
-  IconArrowsSort,
-  IconStarFilled,
-} from '@tabler/icons-react'
+import { IconArrowDown, IconArrowUp, IconArrowsSort } from '@tabler/icons-react'
 import { ScorePicker } from '#/components/score-input'
 import { StarRating } from '#/components/star-rating'
 import { Button } from '#/components/ui/button'
@@ -44,7 +39,6 @@ import {
   TableHeader,
   TableRow,
 } from '#/components/ui/table'
-import { formatRating } from '#/lib/format'
 import { compareRanked } from '#/lib/ranking'
 import type { RankedEntry } from '#/lib/ranking'
 import { cn } from '#/lib/utils'
@@ -427,16 +421,7 @@ function LeaderboardRow({
             m.not_rated()
           ) : (
             <>
-              <span className="sr-only">
-                {m.score_label({ rating: formatRating(item.average) })}
-              </span>
-              <span
-                aria-hidden="true"
-                className="inline-flex items-baseline gap-1 font-medium text-foreground tabular-nums"
-              >
-                <IconStarFilled className="size-3.5" />
-                {formatRating(item.average)}
-              </span>
+              <StarRating value={item.average} average />
               {' · '}
               {m.review_count({ count: item.reviewCount })}
             </>
@@ -448,12 +433,7 @@ function LeaderboardRow({
         {item.average === null ? (
           <span className="text-muted-foreground">{m.not_rated()}</span>
         ) : (
-          <span className="inline-flex items-baseline gap-2">
-            <StarRating value={item.average} />
-            <span className="font-medium tabular-nums">
-              {formatRating(item.average)}
-            </span>
-          </span>
+          <StarRating value={item.average} average />
         )}
       </TableCell>
       <TableCell className="hidden py-3 text-right align-baseline tabular-nums sm:table-cell">

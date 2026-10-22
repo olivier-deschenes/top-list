@@ -197,7 +197,6 @@ function EntryPage() {
                   /10
                 </span>
               </p>
-              <StarRating value={ranked.average} size="md" />
               <p className="text-sm text-muted-foreground">
                 {m.review_count({ count: ranked.reviewCount })}
                 {ranked.rank

@@ -1,57 +1,33 @@
-import { IconStar, IconStarFilled } from '@tabler/icons-react'
-import { formatRating } from '#/lib/format'
-import { RATING } from '#/lib/schemas'
+import { IconStarFilled } from '@tabler/icons-react'
+import { formatRating, formatScore } from '#/lib/format'
 import { cn } from '#/lib/utils'
 import { m } from '#/paraglide/messages'
 
-const STARS = [1, 2, 3, 4, 5] as const
-
-const sizes = {
-  sm: 'size-3.5',
-  md: 'size-4',
-  lg: 'size-6',
-} as const
-
 /**
- * Read-only stars with fractional fill: five stars for a score out of 10.
- * Monochrome: filled vs outline.
+ * A score out of 10 as one star and the number: "★ 7.5". Averages always
+ * show one decimal ("8.0"); a single score shows as picked ("8", "7.5").
  */
 export function StarRating({
   value,
-  size = 'sm',
+  average = false,
   className,
 }: {
   value: number
-  size?: keyof typeof sizes
+  average?: boolean
   className?: string
 }) {
-  const stars = (value / RATING.max) * STARS.length
+  const text = average ? formatRating(value) : formatScore(value)
   return (
     <span
       role="img"
-      aria-label={m.score_label({ rating: formatRating(value) })}
-      className={cn('inline-flex shrink-0 items-center', className)}
+      aria-label={m.score_label({ rating: text })}
+      className={cn(
+        'inline-flex shrink-0 items-baseline gap-1 font-medium text-foreground tabular-nums',
+        className,
+      )}
     >
-      {STARS.map((star) => {
-        const fill = Math.max(0, Math.min(1, stars - (star - 1)))
-        return (
-          <span key={star} className={cn('relative', sizes[size])}>
-            <IconStar
-              aria-hidden="true"
-              className={cn('absolute inset-0 text-foreground/25', sizes[size])}
-            />
-            <span
-              className="absolute inset-0 overflow-hidden"
-              style={{ width: `${fill * 100}%` }}
-            >
-              <IconStarFilled
-                aria-hidden="true"
-                className={cn('text-foreground', sizes[size])}
-              />
-            </span>
-          </span>
-        )
-      })}
+      <IconStarFilled aria-hidden="true" className="size-3.5" />
+      {text}
     </span>
   )
 }

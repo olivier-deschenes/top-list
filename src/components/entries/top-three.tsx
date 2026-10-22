@@ -1,6 +1,5 @@
 import { Link } from '@tanstack/react-router'
 import { Section } from '#/components/page'
-import { StarRating } from '#/components/star-rating'
 import { formatRating } from '#/lib/format'
 import type { RankedEntry } from '#/lib/ranking'
 import { cn } from '#/lib/utils'
@@ -140,7 +139,6 @@ function Score({ item, lead = false }: { item: RankedEntry; lead?: boolean }) {
             /10
           </span>
         </span>
-        <StarRating value={item.average} size={lead ? 'md' : 'sm'} />
       </div>
       <p className="text-sm text-muted-foreground tabular-nums">
         {m.review_count({ count: item.reviewCount })}

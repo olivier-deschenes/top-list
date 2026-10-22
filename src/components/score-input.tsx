@@ -1,7 +1,6 @@
 import { useRef, useState } from 'react'
 import type { Ref } from 'react'
 import { IconMinus, IconPlus, IconSelector } from '@tabler/icons-react'
-import { StarRating } from '#/components/star-rating'
 import { Button } from '#/components/ui/button'
 import {
   Popover,
@@ -85,9 +84,6 @@ export function ScoreSlider({
             {unset ? '–' : formatScore(value)}
           </output>
           <span className="text-sm text-muted-foreground">/10</span>
-          {unset ? null : (
-            <StarRating value={value} size="md" className="ml-1 self-center" />
-          )}
         </div>
         <div className="flex gap-1">
           <Button
