@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useHydrated } from '@tanstack/react-router'
 import { IconCheck, IconCopy, IconShare } from '@tabler/icons-react'
+import { QRCodeSVG } from 'qrcode.react'
 import { toast } from 'sonner'
 import { Button } from '#/components/ui/button'
 import {
@@ -85,6 +86,30 @@ export function ShareLink({
   )
 }
 
+/**
+ * The group link as a QR code, for opening it on a phone nearby. Always dark
+ * on white, since some scanners can't read inverted codes.
+ */
+function GroupQrCode({ groupId }: { groupId: string }) {
+  const url = useGroupUrl(groupId)
+  return (
+    <div className="flex items-center gap-4">
+      <div className="shrink-0 bg-white p-2 ring-1 ring-foreground/10">
+        <QRCodeSVG
+          value={url}
+          size={112}
+          marginSize={0}
+          role="img"
+          aria-label={m.invite_qr_label()}
+        />
+      </div>
+      <p className="text-sm text-pretty text-muted-foreground">
+        {m.invite_qr_hint()}
+      </p>
+    </div>
+  )
+}
+
 export function InviteDialog({
   groupId,
   groupName,
@@ -104,6 +129,7 @@ export function InviteDialog({
           <DialogDescription>{m.invite_hint()}</DialogDescription>
         </DialogHeader>
         <ShareLink groupId={groupId} groupName={groupName} />
+        <GroupQrCode groupId={groupId} />
       </DialogContent>
     </Dialog>
   )

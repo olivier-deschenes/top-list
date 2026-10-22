@@ -95,6 +95,8 @@
   "invite_copy": "Copier le lien",
   "invite_copied": "Lien copié",
   "invite_share": "Partager",
+  "invite_qr_label": "Code QR du lien du groupe",
+  "invite_qr_hint": "Scannez-le avec l’appareil photo d’un téléphone pour y ouvrir le groupe.",
   "group_not_found_title": "Groupe introuvable",
   "group_not_found_body": "Vérifiez le lien. Le groupe a peut-être été supprimé.",
   "group_id_label": "Identifiant du groupe",
